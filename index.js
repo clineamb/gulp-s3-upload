@@ -1,6 +1,5 @@
 "use strict";
 
-// through2 is a thin wrapper around node transform streams
 var through = require('through2')
 ,   gutil   = require('gulp-util')
 ,   AWS     = require('aws-sdk')
@@ -19,7 +18,6 @@ function gulpPrefixer(s3) {
             acl:    ""             // optional, defaults to 'public-read'
         }
     */
-    
     return function(options) {
     
         var stream, keyname_transform;
