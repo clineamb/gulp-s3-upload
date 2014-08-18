@@ -30,7 +30,7 @@ function gulpPrefixer(s3) {
             var keyname, keyparts, filename, mimetype;
 
             if(file.isNull()) {
-                // Do nothing if no contents
+                //  Do nothing if no contents
             }
             
             if(file.isBuffer()) {
@@ -66,7 +66,7 @@ function gulpPrefixer(s3) {
                                 gutil.log(gutil.colors.cyan("Updated..."), keyname);
 
                             } else {
-                                gutil.log(gutil.colors.gray("No change in..."), keyname);
+                                gutil.log(gutil.colors.gray("No Change..."), keyname);
                             }
                             
                         } else {    // doesn't exist in bucket, it's new
@@ -85,9 +85,8 @@ function gulpPrefixer(s3) {
 
 // Exporting the plugin main function
 module.exports = function(config) {
- 
     if(!config) {
-        throw new PluginError(PLUGIN_NAME, "Missing AWS Key & secret");
+        throw new PluginError(PLUGIN_NAME, "Missing AWS Key & secret.");
         return false;
     }
     
