@@ -1,7 +1,6 @@
 "use strict";
 
-var Path    = require('path')
-;
+var Path    = require('path');
 
 module.exports = {
     parsePath: function(path) {
