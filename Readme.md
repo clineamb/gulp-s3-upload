@@ -5,7 +5,11 @@ This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
+
+**Note**
 I haven't written tests for this quite yet, since it utilizes an Amazon AWS account.
+This is also my first gulp plugin and my first npm published package, so any advice/help appreciated.
+Thanks, Caroline
 
 ## Install
     npm install gulp-s3-upload
