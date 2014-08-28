@@ -1,5 +1,3 @@
-"use strict";
-
 var through = require('through2')
 ,   gutil   = require('gulp-util')
 ,   AWS     = require('aws-sdk')
