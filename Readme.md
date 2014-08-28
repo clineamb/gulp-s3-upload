@@ -1,7 +1,6 @@
 # gulp-s3-upload
 
-Made for work + personal use with to work with our production flow.
-We're constantly uploading new assets to Amazone S3 servers.
+Made for work + personal use for uploading assets to Amazon S3 servers.  
 This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
