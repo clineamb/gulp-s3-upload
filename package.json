@@ -1,6 +1,6 @@
 {
   "name": "gulp-s3-upload",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A gulp task to upload/update assets to an S3 account.",
   "main": "index.js",
   "directories": {
