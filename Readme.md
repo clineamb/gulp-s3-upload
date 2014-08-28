@@ -1,4 +1,3 @@
-# WIP
 # gulp-s3-upload
 
 Made for work + personal use with to work with our production flow.
@@ -6,6 +5,8 @@ We're constantly uploading new assets to Amazone S3 servers.
 This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
+
+I haven't written tests for this quite yet, since it utilizes an Amazon AWS account.
 
 ## Install
     npm install gulp-s3-upload
@@ -25,25 +26,27 @@ Create a task.
 
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
-            .pipe(aws({
-                bucket: 'your-bucket-name',  //  Required
-                acl:    'public-read',       //  Optional ACL permissions, defaults to public-read.
-                name_transform: null
+            .pipe(s3({
+                bucket: 'your-bucket-name', //  Required
+                acl:    'public-read'       //  Optional ACL permissions, defaults to public-read.
             }))
         ;
     });
 
+
 #### Options
 
 *bucket* (required)
-Type: `string`
-The bucket that the files will be uploaded tp/
 
-*acl* 
+Type: `string`
+The bucket that the files will be uploaded to.
+
+**acl**
+
 Type: `string`
 See [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html) for more information.  Defaults to 'public-read'.
 
-*name_transform*
+**name_transform**
 Type: `function`
 
 Use this to transform your file names before they're uploaded to your S3 bucket.
