@@ -17,9 +17,9 @@ Put in your AWS Developer key/secret. Region is optional.
 
     var gulp = require('gulp');
     var s3 = require('gulp-s3-upload')({
-        accessKeyId:        "YOUR DEV ID",
-        secretAccessKey:    "YOUR SECRET",
-        region:             "us-west-2"     // optional
+        key:       "YOUR DEV ID",
+        secret:    "YOUR SECRET",
+        region:    "us-west-2"     // optional
     });
 
 Create a task.

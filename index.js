@@ -4,12 +4,11 @@ var through = require('through2')
 ,   mime    = require('mime')
 ,   helper  = require('./src/methods.js')
 ,   PluginError = gutil.PluginError
-,   s3, s3_params
 ;
 
 const PLUGIN_NAME = 'gulp-s3-upload';
 
-function gulpPrefixer(s3) {
+function gulpPrefixer(AWS) {
     /*
         options = {
             bucket: "bucket-name", // required
@@ -19,6 +18,7 @@ function gulpPrefixer(s3) {
     return function(options) {
     
         var stream, keyname_transform;
+        var _s3 = new AWS.S3();
         
         if(!options.bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
@@ -45,11 +45,13 @@ function gulpPrefixer(s3) {
                 keyname = keyname.replace(/\\/g, "/");  // jic windows
                 mimetype = mime.lookup(keyname);
                 
-                s3.client.getObject({
-                    Bucket: s3_params.Bucket
+                _s3.getObject({
+                    Bucket: options.bucket
                 ,   Key: keyname
                 }, function(getErr, getData) {
-                    s3.client.putObject({
+                    gutil.colors.red("S3 Error:", getErr);
+
+                    _s3.putObject({
                         Bucket: options.bucket,
                         ACL:    options.acl || 'public-read',
                         Key:    keyname,
@@ -78,22 +80,26 @@ function gulpPrefixer(s3) {
         });
 
         return stream;
-    }
+    };
 };
 
 // Exporting the plugin main function
 module.exports = function(config) {
+    var aws_config = {};
+
+    aws_config.accessKeyId      = config.key;
+    aws_config.secretAccessKey  = config.secret;
+
+    if(config.region) {
+        aws_config.region = config.region;
+    }
+
     if(!config) {
         throw new PluginError(PLUGIN_NAME, "Missing AWS Key & secret.");
         return false;
     }
     
-    AWS.config.update({
-        accessKeyId:        config.key
-    ,   secretAccessKey:    config.secret
-    });
+    AWS.config.update(aws_config);
 
-    s3 = new AWS.S3();
-
-    return gulpPrefixer(s3);
+    return gulpPrefixer(AWS);
 }
