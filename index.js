@@ -29,54 +29,58 @@ function gulpPrefixer(AWS) {
 
             if(file.isNull()) {
                 //  Do nothing if no contents
+                return callback(null, file);
+            }
+
+            if (file.isStream()) {
+                return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support'));
             }
             
-            if(file.isBuffer()) {
-                if(options.name_transform) {
-                    // allow the transform function to take the complete path
-                    // in case the user wants to change the path of the file, too.
-                    keyname = options.name_transform(file.relative);
-                } else {
-                    // otherwise keep it exactly parallel
-                    keyparts = helper.parsePath(file.relative);
-                    keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
-                }
-                
-                keyname = keyname.replace(/\\/g, "/");  // jic windows
-                mimetype = mime.lookup(keyname);
-                
-                _s3.getObject({
-                    Bucket: options.bucket
-                ,   Key: keyname
-                }, function(getErr, getData) {
-                    gutil.colors.red("S3 Error:", getErr);
-
-                    _s3.putObject({
-                        Bucket: options.bucket,
-                        ACL:    options.acl || 'public-read',
-                        Key:    keyname,
-                        Body:   file.contents,
-                        ContentType: mimetype
-                    }, function(err, data) {
-                        if(err) {
-                            gutil.log("Error with", keyname);
-                            gutil.log(err);
-                        } else if(getData) {
-                            if(getData.ETag !== data.ETag) {
-                                gutil.log(gutil.colors.cyan("Updated..."), keyname);
-
-                            } else {
-                                gutil.log(gutil.colors.gray("No Change..."), keyname);
-                            }
-                            
-                        } else {    // doesn't exist in bucket, it's new
-                            gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
-                        }
-                    });
-                });
+            if(options.name_transform) {
+                // allow the transform function to take the complete path
+                // in case the user wants to change the path of the file, too.
+                keyname = options.name_transform(file.relative);
+            } else {
+                // otherwise keep it exactly parallel
+                keyparts = helper.parsePath(file.relative);
+                keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
             }
 
-            return callback();
+            keyname = keyname.replace(/\\/g, "/");  // jic windows
+            mimetype = mime.lookup(keyname);
+
+            _s3.getObject({
+                Bucket: options.bucket
+            ,   Key: keyname
+            }, function(getErr, getData) {
+                if (getErr && getErr.statusCode !== 404) {
+                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + getErr.message));
+                }
+
+                _s3.putObject({
+                    Bucket: options.bucket,
+                    ACL:    options.acl || 'public-read',
+                    Key:    keyname,
+                    Body:   file.contents,
+                    ContentType: mimetype
+                }, function(err, data) {
+                    if(err) {
+                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
+                    }
+                    if(getData) {
+                        if(getData.ETag !== data.ETag) {
+                            gutil.log(gutil.colors.cyan("Updated..."), keyname);
+
+                        } else {
+                            gutil.log(gutil.colors.gray("No Change..."), keyname);
+                        }
+                        
+                    } else {    // doesn't exist in bucket, it's new
+                        gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
+                    }
+                    callback(null, file);
+                });
+            });
         });
 
         return stream;
