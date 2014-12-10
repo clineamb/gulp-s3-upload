@@ -53,6 +53,23 @@ Type: `string`
 See [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html) 
 for more information.  Defaults to 'public-read'.
 
+**gzip**
+
+Type: `boolean`
+
+Set the `Content-Encoding` meta to `gzip` so a gzipped version of the file can be uploaded to S3.
+
+**cache**
+
+Type: `number`
+
+Set the `Cache-Control` meta to `max-age={cache}` for the object, so browsers won't fetch the file on every page request.
+
+**meta**
+
+Type: `object`
+
+Set metadata values for the object. If you use `{myKey: 'Some value'}` the uploaded object will have the meta property *myKey* with the value *Some value*.
 
 **name_transform**
 
