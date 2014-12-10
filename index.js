@@ -16,10 +16,10 @@ function gulpPrefixer(AWS) {
         }
     */
     return function(options) {
-    
+
         var stream, keyname_transform;
         var _s3 = new AWS.S3();
-        
+
         if(!options.bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
@@ -35,7 +35,7 @@ function gulpPrefixer(AWS) {
             if (file.isStream()) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support'));
             }
-            
+
             if(options.name_transform) {
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
@@ -57,13 +57,24 @@ function gulpPrefixer(AWS) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + getErr.message));
                 }
 
-                _s3.putObject({
+                var objectOptions = {
                     Bucket: options.bucket,
                     ACL:    options.acl || 'public-read',
                     Key:    keyname,
                     Body:   file.contents,
                     ContentType: mimetype
-                }, function(err, data) {
+                };
+
+                if( options.gzip )
+                  objectOptions.ContentEncoding = 'gzip';
+
+                if( options.cache )
+                 	objectOptions.CacheControl = 'max-age=' + options.cache;
+
+                if( options.meta )
+                	objectOptions.Metadata = options.meta;
+
+                _s3.putObject( objectOptions, function(err, data) {
                     if(err) {
                         return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
                     }
@@ -74,7 +85,7 @@ function gulpPrefixer(AWS) {
                         } else {
                             gutil.log(gutil.colors.gray("No Change..."), keyname);
                         }
-                        
+
                     } else {    // doesn't exist in bucket, it's new
                         gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
                     }
@@ -102,7 +113,7 @@ module.exports = function(config) {
         throw new PluginError(PLUGIN_NAME, "Missing AWS Key & secret.");
         return false;
     }
-    
+
     AWS.config.update(aws_config);
 
     return gulpPrefixer(AWS);
