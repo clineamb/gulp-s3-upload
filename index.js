@@ -65,23 +65,27 @@ function gulpPrefixer(AWS) {
                     ContentType: mimetype
                 };
 
-                if( options.gzip )
-                  objectOptions.ContentEncoding = 'gzip';
+                if(options.gzip) {
+                    objectOptions.ContentEncoding = 'gzip';
+                }
 
-                if( options.cache )
-                 	objectOptions.CacheControl = 'max-age=' + options.cache;
+                if(options.cache) {
+                    objectOptions.CacheControl = 'max-age=' + options.cache;
+                }
 
-                if( options.meta )
+                if(options.meta) {
                 	objectOptions.Metadata = options.meta;
+                }
 
-                _s3.putObject( objectOptions, function(err, data) {
+                _s3.putObject(objectOptions, function(err, data) {
                     if(err) {
                         return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
                     }
+
                     if(getData) {
+
                         if(getData.ETag !== data.ETag) {
                             gutil.log(gutil.colors.cyan("Updated..."), keyname);
-
                         } else {
                             gutil.log(gutil.colors.gray("No Change..."), keyname);
                         }
@@ -89,6 +93,7 @@ function gulpPrefixer(AWS) {
                     } else {    // doesn't exist in bucket, it's new
                         gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
                     }
+
                     callback(null, file);
                 });
             });
