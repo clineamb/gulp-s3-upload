@@ -48,7 +48,7 @@ function gulpPrefixer(AWS) {
 
             keyname = keyname.replace(/\\/g, "/");  // jic windows
 
-            var lookupKeyname = options.mimeTypeLookup ? options.mimeTypeLookup(keyname) : keyname;
+            var lookupKeyname = options.mime_type_lookup ? options.mime_type_lookup(keyname) : keyname;
 
             mimetype = mime.lookup(lookupKeyname);
 
