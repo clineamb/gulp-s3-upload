@@ -25,6 +25,8 @@ Put in your AWS Developer key/secret. Region is optional.
         region:    "us-west-2"     // optional
     });
 
+The other options not mentioned above available in the [AWS Config constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are undefined.
+
 Create a task.
 
     gulp.task("upload", function() {

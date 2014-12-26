@@ -105,21 +105,17 @@ function gulpPrefixer(AWS) {
 
 // Exporting the plugin main function
 module.exports = function(config) {
-    var aws_config = {};
+    var aws_config = config || {};
 
     aws_config.accessKeyId      = config.key;
     aws_config.secretAccessKey  = config.secret;
 
-    if(config.region) {
-        aws_config.region = config.region;
-    }
 
-    if(!config) {
+    if(!aws_config.accessKeyId || !aws_config.secretAccessKey) {
         throw new PluginError(PLUGIN_NAME, "Missing AWS Key & secret.");
-        return false;
     }
 
     AWS.config.update(aws_config);
 
     return gulpPrefixer(AWS);
-}
+};
