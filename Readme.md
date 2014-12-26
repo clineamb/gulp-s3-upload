@@ -15,7 +15,7 @@ Thanks, Caroline
     npm install gulp-s3-upload
 
 ## Usage
-    
+
 Put in your AWS Developer key/secret. Region is optional.
 
     var gulp = require('gulp');
@@ -52,7 +52,7 @@ The bucket that the files will be uploaded to.
 
 Type: `string`
 
-See [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html) 
+See [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
 for more information.  Defaults to 'public-read'.
 
 **gzip**
@@ -93,9 +93,28 @@ Example:
         ;
     });
 
+**mime_type_lookup**
+
+Type: `function`
+
+Use this to transform what the key that is used to match the MIME type when uploading to s3.
+
+Example:
+
+    gulp.task("upload_transform", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(aws({
+            bucket: 'example-bucket',
+            mime_type_lookup: function(originalFilepath) {
+                return originalFilepath.replace('.gz', ''); //ignore gzip extension
+            },
+        }));
+    });
+
+
 ----------------------------------------------------
 
-### License 
+### License
 Copyright (c) 2014, [Caroline Amaba](mailto:caroline.amaba@gmail.com)
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
