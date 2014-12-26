@@ -25,7 +25,7 @@ function gulpPrefixer(AWS) {
         }
 
         stream = through.obj(function(file, enc, callback) {
-            var keyname, keyparts, filename, mimetype;
+            var keyname, keyparts, filename, mimetype, mimeLookupName;
 
             if(file.isNull()) {
                 //  Do nothing if no contents
@@ -47,7 +47,11 @@ function gulpPrefixer(AWS) {
             }
 
             keyname = keyname.replace(/\\/g, "/");  // jic windows
-            mimetype = mime.lookup(keyname);
+
+            mimeLookupName = options.mime_type_lookup ? options.mime_type_lookup(keyname) : keyname;
+
+            mimetype = mime.lookup(mimeLookupName);
+
 
             _s3.getObject({
                 Bucket: options.bucket
