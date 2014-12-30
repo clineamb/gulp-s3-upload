@@ -36,10 +36,10 @@ function gulpPrefixer(AWS) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support'));
             }
 
-            if(options.name_transform) {
+            if(options.nameTransform) {
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
-                keyname = options.name_transform(file.relative);
+                keyname = options.nameTransform(file.relative);
             } else {
                 // otherwise keep it exactly parallel
                 keyparts = helper.parsePath(file.relative);
@@ -48,10 +48,9 @@ function gulpPrefixer(AWS) {
 
             keyname = keyname.replace(/\\/g, "/");  // jic windows
 
-            mimeLookupName = options.mime_type_lookup ? options.mime_type_lookup(keyname) : keyname;
+            mimeLookupName = options.mimeTypeLookup ? options.mimeTypeLookup(keyname) : keyname;
 
             mimetype = mime.lookup(mimeLookupName);
-
 
             _s3.getObject({
                 Bucket: options.bucket

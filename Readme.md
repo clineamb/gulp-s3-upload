@@ -39,7 +39,7 @@ Create a task.
     });
 
 
-#### Options
+### Options
 
 **bucket** *(required)*
 
@@ -77,7 +77,7 @@ Type: `object`
 Set metadata values for the object. If you use `{myKey: 'Some value'}` the uploaded object will have the meta property *myKey* with the value *Some value*.
 
 
-**name_transform**
+**nameTransform**
 
 Type: `function`
 
@@ -89,7 +89,7 @@ Example:
         gulp.src("./dir/to/upload/**")
             .pipe(aws({
                 bucket: 'example-bucket',
-                name_transform: function(relative_filename) {
+                nameTransform: function(relative_filename) {
                     var new_name = change_file_name(relative_filename);
                     return new_name;
                 }
@@ -110,7 +110,7 @@ Example:
         gulp.src("./dir/to/upload/**")
         .pipe(aws({
             bucket: 'example-bucket',
-            mime_type_lookup: function(originalFilepath) {
+            mimeTypeLookup: function(originalFilepath) {
                 return originalFilepath.replace('.gz', ''); //ignore gzip extension
             },
         }));
