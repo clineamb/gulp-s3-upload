@@ -23,10 +23,10 @@
   },
   "homepage": "https://github.com/clineamb/gulp-s3-upload",
   "dependencies": {
-    "aws-sdk": "^2.0.15",
-    "gulp-util": "^3.0.0",
-    "mime": "^1.2.11",
-    "through2": "^0.6.1",
-    "underscore": "^1.7.0"
+    "aws-sdk": "2.1.4",
+    "gulp-util": "3.0.1",
+    "mime": "1.2.11",
+    "through2": "1.1.1",
+    "underscore": "1.7.0"
   }
 }
