@@ -1,6 +1,6 @@
 {
   "name": "gulp-s3-upload",
-  "version": "0.8.0",
+  "version": "0.8.5",
   "description": "A gulp task to upload/update assets to an S3 account.",
   "main": "index.js",
   "directories": {
@@ -23,9 +23,10 @@
   },
   "homepage": "https://github.com/clineamb/gulp-s3-upload",
   "dependencies": {
-    "through2": "^0.6.1",
     "aws-sdk": "^2.0.15",
     "gulp-util": "^3.0.0",
-    "mime": "^1.2.11"
+    "mime": "^1.2.11",
+    "through2": "^0.6.1",
+    "underscore": "^1.7.0"
   }
 }

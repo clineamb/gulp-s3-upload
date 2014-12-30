@@ -1,6 +1,7 @@
 "use strict";
 
-var Path    = require('path');
+var Path    = require('path'),
+    _       = require('underscore');
 
 module.exports = {
     parsePath: function(path) {
@@ -13,5 +14,12 @@ module.exports = {
     },
     buildName: function(dirs, filename) {
         return Path.join(dirs, filename);
+    },
+    mergeOptions: function(defaultObjOpts, userObjOpts) {
+        // Body is handled by stream, Bucket will be defined
+        // in first parameter.
+        userObjOpts = _.omit(userObjOpts, ['Body', 'Bucket']);
+
+        return _.extend(defaultObjOpts, userObjOpts);
     }
 };

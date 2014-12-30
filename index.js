@@ -15,7 +15,7 @@ function gulpPrefixer(AWS) {
             acl:    ""             // optional, defaults to 'public-read'
         }
     */
-    return function(options) {
+    return function(options, s3_params) {
 
         var stream, keyname_transform;
         var _s3 = new AWS.S3();
@@ -36,6 +36,8 @@ function gulpPrefixer(AWS) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support'));
             }
 
+            // Plugin Transforms & Look-ups
+            // File Name transform
             if(options.nameTransform) {
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
@@ -48,6 +50,7 @@ function gulpPrefixer(AWS) {
 
             keyname = keyname.replace(/\\/g, "/");  // jic windows
 
+            // Mime Lookup
             mimeLookupName = options.mimeTypeLookup ? options.mimeTypeLookup(keyname) : keyname;
 
             mimetype = mime.lookup(mimeLookupName);
@@ -80,6 +83,10 @@ function gulpPrefixer(AWS) {
                 	objectOptions.Metadata = options.meta;
                 }
 
+                if(s3_params) {
+                    objectOptions = helper.mergeOptions(s3_params);
+                }
+                
                 _s3.putObject(objectOptions, function(err, data) {
                     if(err) {
                         return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
