@@ -84,7 +84,7 @@ function gulpPrefixer(AWS) {
                 }
 
                 if(s3_params) {
-                    objectOptions = helper.mergeOptions(s3_params);
+                    objectOptions = helper.mergeOptions(objectOptions, s3_params);
                 }
                 
                 _s3.putObject(objectOptions, function(err, data) {
