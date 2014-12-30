@@ -5,11 +5,7 @@ This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
-
-**Note**
-I haven't written tests for this quite yet, since it utilizes an Amazon AWS account.
-This is also my first gulp plugin and my first npm published package, so any advice/help appreciated.
-Thanks, Caroline
+[NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](changelog.md)
 
 ## Install
     npm install gulp-s3-upload
@@ -27,6 +23,8 @@ Put in your AWS Developer key/secret. Region is optional.
 
 The other options not mentioned above available in the [AWS Config constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are undefined.
 
+Signature to pass through pipe: `s3(plugin_options [, putObjectParams])`;
+
 Create a task.
 
     gulp.task("upload", function() {
@@ -38,6 +36,11 @@ Create a task.
         ;
     });
 
+**As of Version 0.8.5**, the s3 task can now take a second parameter that has all the options available in the [S3 putObject documentation](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property).  
+
+Any settings that are overlapped between the required paramter in this new optional parameter will be overwritten if defined in the second optional parameter, with `Body` being the exception, since that is purely handled by the gulp stream, and `Bucket` since it is required in the first set of required options.
+
+The way this is handled in the future will be changed for version 1.0, condensing everything into one `options` parameter. See the [Feature Roadmap](roadmap.md) for details.
 
 ### Options
 
@@ -87,7 +90,7 @@ Example:
 
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
-            .pipe(aws({
+            .pipe(s3({
                 bucket: 'example-bucket',
                 nameTransform: function(relative_filename) {
                     var new_name = change_file_name(relative_filename);
@@ -108,14 +111,13 @@ Example:
 
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
-        .pipe(aws({
+        .pipe(s3({
             bucket: 'example-bucket',
             mimeTypeLookup: function(originalFilepath) {
                 return originalFilepath.replace('.gz', ''); //ignore gzip extension
             },
         }));
     });
-
 
 ----------------------------------------------------
 
