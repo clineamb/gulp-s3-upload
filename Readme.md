@@ -1,5 +1,7 @@
 # gulp-s3-upload
 
+[![Dependency Status](https://www.versioneye.com/user/projects/54a2f974974275fa0a00000f/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54a2f974974275fa0a00000f)
+
 Made for work + personal use for uploading assets to Amazon S3 servers.  
 This helps to make it an easy gulp task.
 
