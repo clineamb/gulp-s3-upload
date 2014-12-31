@@ -7,95 +7,127 @@ This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
-[NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](changelog.md)
+[NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](docs/changelog.md)
 
 ## Install
+
     npm install gulp-s3-upload
 
 ## Usage
 
-Put in your AWS Developer key/secret. Region is optional.
+Put in your AWS Developer key/secret. These are required, or else we don't have access to the bucket you want to upload to.
 
     var gulp = require('gulp');
     var s3 = require('gulp-s3-upload')({
-        key:       "YOUR DEV ID",
-        secret:    "YOUR SECRET",
-        region:    "us-west-2"     // optional
+        accessKeyId:        "YOUR DEV ID",
+        secretAccessKey:    "YOUR SECRET"
     });
 
-The other options not mentioned above available in the [AWS Config constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are undefined.
+The other options not mentioned above (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are `undefined`.
 
-Signature to pass through pipe: `s3(plugin_options [, putObjectParams])`;
+`key` and `secret` are also alternative option names, though we encourage the use of `accessKeyId` and `secretAccessKey` to match the AWS Config Constructor.
 
 Create a task.
 
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
             .pipe(s3({
-                bucket: 'your-bucket-name', //  Required
-                acl:    'public-read'       //  Optional ACL permissions, defaults to public-read.
+                Bucket: 'your-bucket-name', //  Required
+                ACL:    'public-read'       //  Needs to be user-defined
             }))
         ;
     });
 
-**As of Version 0.8.5**, the s3 task can now take a second parameter that has all the options available in the [S3 putObject documentation](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property).  
+## Options
 
-Any settings that are overlapped between the required paramter in this new optional parameter will be overwritten if defined in the second optional parameter, with `Body` being the exception, since that is purely handled by the gulp stream, and `Bucket` since it is required in the first set of required options.
+**Bucket (bucket)** *(required)*
 
-The way this is handled in the future will be changed for version 1.0, condensing everything into one `options` parameter. See the [Feature Roadmap](roadmap.md) for details.
+> Type: `string`
 
-### Options
+> The bucket that the files will be uploaded to.
 
-**bucket** *(required)*
+Other available options are the same as the one found in the AWS-SDK docs for S3.  See below for a list of availble AWS-SDK resources that this plugin constantly references.
 
-Type: `string`
+**NOTE:** `Key`, `Body`, and `ContentType` are the only options availble in `putObject` that do NOT need to be defined because the gulp will handle these for you. If you define these accidentally, we will filter them out.
 
-The bucket that the files will be uploaded to.
+### gulp-s3-plugin options
+
+**metadataMap**
+
+> Type: `object` or `function`
+
+> If you have constant metadata you want to attach to each object,
+> just define the object, and it will be included to each object.
+> If you wish to change it per object, you can pass a function through
+> to modify the metadata based on the (transformed) keyname.
+
+Example (passing an `object`):
+
+    gulp.task("upload_transform", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            metadataMap: {
+                "uploadedVia": "gulp-s3-upload",
+                "exampleFlag":  "Asset Flag"
+            }
+        }));
+    });
+
+Example (passing a `function`):
+
+    gulp.task("upload_transform", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            metadataMap: function(keyname) {
+                path.basename(keyname); // just get the filename
+                return metadata_collection[keyname]; // return an object
+            }
+        }));
+    });
+
+> When passing a function, it's important to note that the file
+> will already be transformed either by the `keyTransform` you defined
+> or by the default function which creates a keyname relative to
+> your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
+> depending on how it was structured locally.
+
+**mimeTypelookup**
+
+> Type: `function`
+
+> Use this to transform what the key that is used to match the MIME type when uploading to S3.
+
+    gulp.task("upload_transform", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            mimeTypelookup: function(original_keyname) {
+                return original_keyname.replace('.gz', ''); // ignore gzip extension
+            },
+        }));
+    });
 
 
-**acl**
+**keyTransform (nameTransform)**
 
-Type: `string`
+> Type: `function`
 
-See [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
-for more information.  Defaults to 'public-read'.
-
-
-**gzip**
-
-Type: `boolean`
-
-Set the `Content-Encoding` meta to `gzip` so a gzipped version of the file can be uploaded to S3.
-
-
-**cache**
-
-Type: `number`
-
-Set the `Cache-Control` meta to `max-age={cache}` for the object, so browsers won't fetch the file on every page request.
-
-
-**meta**
-
-Type: `object`
-
-Set metadata values for the object. If you use `{myKey: 'Some value'}` the uploaded object will have the meta property *myKey* with the value *Some value*.
-
-
-**name_transform**
-
-Type: `function`
-
-Use this to transform your file names before they're uploaded to your S3 bucket.
-
-Example:
+> Use this to transform your file names before they're uploaded to your S3 bucket.
+> (Previously known as `name_transform`).
 
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
             .pipe(s3({
-                bucket: 'example-bucket',
-                name_transform: function(relative_filename) {
-                    var new_name = change_file_name(relative_filename);
+                Bucket: 'example-bucket',
+                ACL: 'public-read',
+                keyTransform: function(relative_filename) {
+                    var new_name = changeFileName(relative_filename);
+                    // or do whatever you want
                     return new_name;
                 }
             }))
@@ -103,27 +135,15 @@ Example:
     });
 
 
-**mime_type_lookup**
+## AWS-SDK References
 
-Type: `function`
-
-Use this to transform what the key that is used to match the MIME type when uploading to s3.
-
-Example:
-
-    gulp.task("upload_transform", function() {
-        gulp.src("./dir/to/upload/**")
-        .pipe(s3({
-            bucket: 'example-bucket',
-            mime_type_lookup: function(originalFilepath) {
-                return originalFilepath.replace('.gz', ''); //ignore gzip extension
-            },
-        }));
-    });
+* [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property)
+* [S3 putObject](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property)
+* [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
 
 ----------------------------------------------------
 
-### License
+## License
 
 Copyright (c) 2014, [Caroline Amaba](mailto:caroline.amaba@gmail.com)
 

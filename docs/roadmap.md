@@ -12,5 +12,5 @@ Future usage:
 
     gulp.task("upload", function() {
         return gulp.src("./dir/to/upload/**")
-            .pipe(s3(YOUR-BUCKET-NAME, {options}))
+            .pipe(s3({options}))
     });
