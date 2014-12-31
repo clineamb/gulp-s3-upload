@@ -52,7 +52,7 @@ Other available options are the same as the one found in the AWS-SDK docs for S3
 
 ### gulp-s3-plugin options
 
-**metadataMap**
+#### metadataMap
 
 > Type: `object` or `function`
 
@@ -63,7 +63,7 @@ Other available options are the same as the one found in the AWS-SDK docs for S3
 
 Example (passing an `object`):
 
-    gulp.task("upload_transform", function() {
+    gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
             Bucket: 'example-bucket',
@@ -76,9 +76,22 @@ Example (passing an `object`):
     });
 
 Example (passing a `function`):
+    
+    // ... setup gulp-s3-upload ...
+    var path = require('path');
 
-    gulp.task("upload_transform", function() {
-        gulp.src("./dir/to/upload/**")
+    var metadata_collection = {
+        "file1.txt": {
+            "uploadedVia": "gulp-s3-upload",
+            "example": "Example Data"
+        },
+        "file2.html": {
+            "uploadedVia": "gulp-s3-upload"
+        }
+    };
+
+    gulp.task("uploadWithMeta", function() {
+        gulp.src("./upload/**")
         .pipe(s3({
             Bucket: 'example-bucket',
             ACL: 'public-read',
@@ -93,15 +106,20 @@ Example (passing a `function`):
 > will already be transformed either by the `keyTransform` you defined
 > or by the default function which creates a keyname relative to
 > your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
-> depending on how it was structured locally.
+> depending on how it was structured locally (hence why in the example, 
+> the `path` module is used to just get the filename).
+> 
+> **Note:** You should be responsible for handling mismatching/non-matching keynames
+> to the metadata you're mapping.
 
-**mimeTypelookup**
+
+#### mimeTypelookup
 
 > Type: `function`
 
 > Use this to transform what the key that is used to match the MIME type when uploading to S3.
 
-    gulp.task("upload_transform", function() {
+    gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
             Bucket: 'example-bucket',
@@ -113,7 +131,7 @@ Example (passing a `function`):
     });
 
 
-**keyTransform (nameTransform)**
+#### keyTransform (nameTransform)
 
 > Type: `function`
 

@@ -24,7 +24,7 @@ module.exports = {
             'metadataMap',
             'Key',
             'Body',
-            'ContentType'
+            'ContentType',
             'verbose'
         ];
 
