@@ -38,10 +38,10 @@ function gulpPrefixer(AWS) {
 
             // Plugin Transforms & Look-ups
             // File Name transform
-            if(options.nameTransform) {
+            if(options.name_transform) {
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
-                keyname = options.nameTransform(file.relative);
+                keyname = options.name_transform(file.relative);
             } else {
                 // otherwise keep it exactly parallel
                 keyparts = helper.parsePath(file.relative);
@@ -51,7 +51,7 @@ function gulpPrefixer(AWS) {
             keyname = keyname.replace(/\\/g, "/");  // jic windows
 
             // Mime Lookup
-            mimeLookupName = options.mimeTypeLookup ? options.mimeTypeLookup(keyname) : keyname;
+            mimeLookupName = options.mime_type_lookup ? options.mime_type_lookup(keyname) : keyname;
 
             mimetype = mime.lookup(mimeLookupName);
 

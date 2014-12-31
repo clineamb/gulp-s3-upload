@@ -82,7 +82,7 @@ Type: `object`
 Set metadata values for the object. If you use `{myKey: 'Some value'}` the uploaded object will have the meta property *myKey* with the value *Some value*.
 
 
-**nameTransform**
+**name_transform**
 
 Type: `function`
 
@@ -94,7 +94,7 @@ Example:
         gulp.src("./dir/to/upload/**")
             .pipe(s3({
                 bucket: 'example-bucket',
-                nameTransform: function(relative_filename) {
+                name_transform: function(relative_filename) {
                     var new_name = change_file_name(relative_filename);
                     return new_name;
                 }
@@ -115,7 +115,7 @@ Example:
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
             bucket: 'example-bucket',
-            mimeTypeLookup: function(originalFilepath) {
+            mime_type_lookup: function(originalFilepath) {
                 return originalFilepath.replace('.gz', ''); //ignore gzip extension
             },
         }));

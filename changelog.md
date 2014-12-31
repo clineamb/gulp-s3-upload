@@ -1,5 +1,8 @@
 # Changelog
 
+### Version 0.8.6
+* unchanged the `name_transform` & `mime_type_lookup` function names; could break.  Will change in Version 1
+
 ### Version 0.8.5
 
 * Added optional second paramter that takes
