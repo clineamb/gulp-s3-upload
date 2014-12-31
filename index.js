@@ -27,8 +27,7 @@ function gulpPrefixer(AWS) {
         stream = through.obj(function(file, enc, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name,
-                metadataMapObj, metadataMapFn;
+                mimetype, mime_lookup_name;
 
             if(file.isNull()) {
                 //  Do nothing if no contents
@@ -71,16 +70,19 @@ function gulpPrefixer(AWS) {
             mimetype = mime.lookup(mime_lookup_name);
 
 
-            // === metadataMap
-            // New in V1: Map your files (using the keyname) to a metadata object.
+            //  === metadataMap
+            //  New in V1: Map your files (using the keyname) to a metadata object.
+            //  ONLY if options.Metadata is undefined.
 
-            if(helper.isMetadataMapFn(options.metadataMap)) {
-                metadataMapObj  = options.metadataMap(keyname);
-            } else {
-                metadataMapObj  =  options.metadataMap;
-            }
+            if(!options.Metadata && options.metadataMap) {
+                if(helper.isMetadataMapFn(options.metadataMap)) {
+                    options.Metadata = options.metadataMap(keyname);
+                } else {
+                    options.Metadata  =  options.metadataMap;
+                }
+            } 
+            //  options.Metdata is not filtered out later.
 
-            // === Now let's upload
 
             _s3.getObject({
                 Bucket: the_bucket
@@ -98,7 +100,6 @@ function gulpPrefixer(AWS) {
                 objOpts.Key = keyname;
                 objOpts.Body = file.contents;
                 objOpts.ContentType = mimetype;
-                objOpts.Metadata = metadataMapObj;
  
                 _s3.putObject(objOpts, function(err, data) {
                     if(err) {

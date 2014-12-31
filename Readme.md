@@ -67,6 +67,7 @@ Example (passing an `object`):
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
             Bucket: 'example-bucket',
+    var metadata_collection = {
             ACL: 'public-read',
             metadataMap: {
                 "uploadedVia": "gulp-s3-upload",
@@ -75,12 +76,17 @@ Example (passing an `object`):
         }));
     });
 
+> Passing the `s3.putObject` param option `Metadata` is effectively the same thing
+> as passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not
+> it will use the object passed to `Metadata` as metadata for all the files that
+> will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` will take
+> precedence and be added to each file being uploaded.
+
 Example (passing a `function`):
     
     // ... setup gulp-s3-upload ...
     var path = require('path');
 
-    var metadata_collection = {
         "file1.txt": {
             "uploadedVia": "gulp-s3-upload",
             "example": "Example Data"
@@ -113,7 +119,7 @@ Example (passing a `function`):
 > to the metadata you're mapping.
 
 
-#### mimeTypelookup
+#### mimeTypeLookup
 
 > Type: `function`
 
