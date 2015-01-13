@@ -40,9 +40,9 @@ Create a task.
 
 **Bucket (bucket)** *(required)*
 
-> Type: `string`
+Type: `string`
 
-> The bucket that the files will be uploaded to.
+The bucket that the files will be uploaded to.
 
 Other available options are the same as the one found in the AWS-SDK docs for S3.  See below for a list of availble AWS-SDK resources that this plugin constantly references.
 
@@ -53,10 +53,10 @@ Other available options are the same as the one found in the AWS-SDK docs for S3
 
 #### keyTransform (nameTransform)
 
-> Type: `function`
+Type: `function`
 
-> Use this to transform your file names before they're uploaded to your S3 bucket.
-> (Previously known as `name_transform`).
+Use this to transform your file names before they're uploaded to your S3 bucket.  
+(Previously known as `name_transform`).
 
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
