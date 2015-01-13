@@ -6,9 +6,12 @@ var through = require('through2')
 ,   PluginError = gutil.PluginError
 ;
 
+var _ = require('underscore');
+
 const PLUGIN_NAME = 'gulp-s3-upload';
 
 function gulpPrefixer(AWS) {
+    var file_count = 0;
     /* 
         `putObjectParams` now takes in the S3 putObject parameters:
             http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
@@ -29,13 +32,14 @@ function gulpPrefixer(AWS) {
             var keyTransform, keyname, keyparts, filename,
                 mimetype, mime_lookup_name;
 
+
             if(file.isNull()) {
                 //  Do nothing if no contents
                 return callback(null, file);
             }
 
             if (file.isStream()) {
-                return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support'));
+                return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
             //  ===== Method Transforms & Look-ups
@@ -100,25 +104,28 @@ function gulpPrefixer(AWS) {
                 objOpts.Key = keyname;
                 objOpts.Body = file.contents;
                 objOpts.ContentType = mimetype;
- 
-                _s3.putObject(objOpts, function(err, data) {
-                    if(err) {
-                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
-                    }
-
-                    if(getData) {
-                        if(getData.ETag !== data.ETag) {
-                            gutil.log(gutil.colors.cyan("Updated..."), keyname);
-                        } else {
-                            gutil.log(gutil.colors.gray("No Change..."), keyname);
+                
+                if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+                    _s3.putObject(objOpts, function(err, data) {
+                        if(err) {
+                            return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
                         }
 
-                    } else {    // doesn't exist in bucket, it's new
-                        gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
-                    }
+                        file_count++;
 
-                    callback(null, file);
-                });
+                        if(getData) {
+                            if(getData.ETag !== data.ETag) {
+                                gutil.log(file_count, gutil.colors.cyan("Updated..."), keyname);
+                            } else {
+                                gutil.log(file_count, gutil.colors.gray("No Change..."), keyname);
+                            }
+                        } else {    // doesn't exist in bucket, it's new
+                            gutil.log(file_count, gutil.colors.cyan("Uploaded..."), keyname);
+                        }
+
+                        callback(null, file);
+                    });
+                }
             });
         });
 

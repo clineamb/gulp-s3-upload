@@ -25,7 +25,8 @@ module.exports = {
             'Key',
             'Body',
             'ContentType',
-            'verbose'
+            'verbose',
+            'uploadNewFilesOnly'
         ];
 
         return _.omit(params, omit_array);

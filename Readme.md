@@ -52,90 +52,6 @@ Other available options are the same as the one found in the AWS-SDK docs for S3
 
 ### gulp-s3-plugin options
 
-#### metadataMap
-
-> Type: `object` or `function`
-
-> If you have constant metadata you want to attach to each object,
-> just define the object, and it will be included to each object.
-> If you wish to change it per object, you can pass a function through
-> to modify the metadata based on the (transformed) keyname.
-
-Example (passing an `object`):
-
-    gulp.task("upload", function() {
-        gulp.src("./dir/to/upload/**")
-        .pipe(s3({
-            Bucket: 'example-bucket',
-    var metadata_collection = {
-            ACL: 'public-read',
-            metadataMap: {
-                "uploadedVia": "gulp-s3-upload",
-                "exampleFlag":  "Asset Flag"
-            }
-        }));
-    });
-
-> Passing the `s3.putObject` param option `Metadata` is effectively the same thing
-> as passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not
-> it will use the object passed to `Metadata` as metadata for all the files that
-> will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` will take
-> precedence and be added to each file being uploaded.
-
-Example (passing a `function`):
-    
-    // ... setup gulp-s3-upload ...
-    var path = require('path');
-
-        "file1.txt": {
-            "uploadedVia": "gulp-s3-upload",
-            "example": "Example Data"
-        },
-        "file2.html": {
-            "uploadedVia": "gulp-s3-upload"
-        }
-    };
-
-    gulp.task("uploadWithMeta", function() {
-        gulp.src("./upload/**")
-        .pipe(s3({
-            Bucket: 'example-bucket',
-            ACL: 'public-read',
-            metadataMap: function(keyname) {
-                path.basename(keyname); // just get the filename
-                return metadata_collection[keyname]; // return an object
-            }
-        }));
-    });
-
-> When passing a function, it's important to note that the file
-> will already be transformed either by the `keyTransform` you defined
-> or by the default function which creates a keyname relative to
-> your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
-> depending on how it was structured locally (hence why in the example, 
-> the `path` module is used to just get the filename).
-> 
-> **Note:** You should be responsible for handling mismatching/non-matching keynames
-> to the metadata you're mapping.
-
-
-#### mimeTypeLookup
-
-> Type: `function`
-
-> Use this to transform what the key that is used to match the MIME type when uploading to S3.
-
-    gulp.task("upload", function() {
-        gulp.src("./dir/to/upload/**")
-        .pipe(s3({
-            Bucket: 'example-bucket',
-            ACL: 'public-read',
-            mimeTypelookup: function(original_keyname) {
-                return original_keyname.replace('.gz', ''); // ignore gzip extension
-            },
-        }));
-    });
-
 
 #### keyTransform (nameTransform)
 
@@ -157,6 +73,98 @@ Example (passing a `function`):
             }))
         ;
     });
+
+
+#### metadataMap
+
+Type: `object` or `function`
+
+If you have constant metadata you want to attach to each object,
+just define the object, and it will be included to each object.
+If you wish to change it per object, you can pass a function through
+to modify the metadata based on the (transformed) keyname.
+
+Example (passing an `object`):
+
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            metadataMap: {
+                "uploadedVia": "gulp-s3-upload",
+                "exampleFlag":  "Asset Flag"
+            }
+        }));
+    });
+
+Passing the `s3.putObject` param option `Metadata` is effectively the same thing
+as passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not
+it will use the object passed to `Metadata` as metadata for all the files that
+will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` will take
+precedence and be added to each file being uploaded.
+
+Example (passing a `function`):
+    
+    // ... setup gulp-s3-upload ...
+    var path = require('path');
+    var metadata_collection = {
+        "file1.txt": {
+            "uploadedVia": "gulp-s3-upload",
+            "example": "Example Data"
+        },
+        "file2.html": {
+            "uploadedVia": "gulp-s3-upload"
+        }
+    };
+
+    gulp.task("uploadWithMeta", function() {
+        gulp.src("./upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            metadataMap: function(keyname) {
+                path.basename(keyname); // just get the filename
+                return metadata_collection[keyname]; // return an object
+            }
+        }));
+    });
+
+When passing a function, it's important to note that the file
+will already be transformed either by the `keyTransform` you defined
+or by the default function which creates a keyname relative to
+your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
+depending on how it was structured locally (hence why in the example, 
+the `path` module is used to just get the filename).
+
+**Note:** You should be responsible for handling mismatching/non-matching keynames
+to the metadata you're mapping.
+
+#### mimeTypeLookup
+
+Type: `function`
+
+Use this to transform what the key that is used to match the MIME type when uploading to S3.
+
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            mimeTypelookup: function(original_keyname) {
+                return original_keyname.replace('.gz', ''); // ignore gzip extension
+            },
+        }));
+    });
+
+
+#### uploadNewFilesOnly
+
+Type: `boolean`
+
+Set `uploadNewFilesOnly: true` if you only want to upload new files and not
+overwrite existing ones.
+
 
 
 ## AWS-SDK References
