@@ -4,19 +4,18 @@ var through = require('through2')
 ,   mime    = require('mime')
 ,   helper  = require('./src/helper.js')
 ,   PluginError = gutil.PluginError
+,   gulpPrefixer
 ;
-
-var _ = require('underscore');
 
 const PLUGIN_NAME = 'gulp-s3-upload';
 
-function gulpPrefixer(AWS) {
+gulpPrefixer = function(AWS) {
     var file_count = 0;
     /* 
         `putObjectParams` now takes in the S3 putObject parameters:
             http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
         - will have a catch for `bucket` vs `Bucket`
-        - Will filter out Key because that is handled by the script and keyTransform
+        - Will filter out `Body` and `Key` because that is handled by the script and keyTransform
     */
     return function(options) {
 
@@ -29,13 +28,15 @@ function gulpPrefixer(AWS) {
 
         stream = through.obj(function(file, enc, callback) {
 
-            var keyTransform, keyname, keyparts, filename,
+            var _stream = this,
+                keyTransform, keyname, keyparts, filename,
                 mimetype, mime_lookup_name;
 
 
             if(file.isNull()) {
                 //  Do nothing if no contents
-                return callback(null, file);
+                // callback(null, file);
+                return callback(null);
             }
 
             if (file.isStream()) {
@@ -87,7 +88,6 @@ function gulpPrefixer(AWS) {
             } 
             //  options.Metdata is not filtered out later.
 
-
             _s3.getObject({
                 Bucket: the_bucket
             ,   Key:    keyname
@@ -115,15 +115,16 @@ function gulpPrefixer(AWS) {
 
                         if(getData) {
                             if(getData.ETag !== data.ETag) {
-                                gutil.log(file_count, gutil.colors.cyan("Updated..."), keyname);
+                                gutil.log(gutil.colors.cyan("Updated....."), keyname);
                             } else {
-                                gutil.log(file_count, gutil.colors.gray("No Change..."), keyname);
+                                gutil.log(gutil.colors.gray("No Change..."), keyname);
                             }
                         } else {    // doesn't exist in bucket, it's new
-                            gutil.log(file_count, gutil.colors.cyan("Uploaded..."), keyname);
+                            gutil.log(file_count, gutil.colors.cyan ("Uploaded...."), keyname);
                         }
-
-                        callback(null, file);
+                        
+                        // callback(null, file);
+                        callback(null);
                     });
                 }
             });
