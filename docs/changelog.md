@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.0
+* See changes beta-1.0 changes.
+* Added `uploadNewFilesOnly` flag option.
+* Fixed issue [#3](http://github.com/clineamb/gulp-s3-upload/issues/3), files stopping at a certain number consistently.
+
 ## Version beta-1.0
 * AWS constructor now follows [AWS-SDK constructor parameters.](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property).
 * pipe transform `s3()` now only takes one `options` param that is parallel to the [AWS-S3 putObject method](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property).
