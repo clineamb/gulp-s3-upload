@@ -55,7 +55,9 @@ function gulpPrefixer(AWS) {
 
             mimetype = mime.lookup(mimeLookupName);
 
-            _s3.getObject({
+            gutil.log(gutil.colors.gray("Checking:       "), keyname);
+
+            _s3.headObject({
                 Bucket: options.bucket
             ,   Key: keyname
             }, function(getErr, getData) {
@@ -86,7 +88,9 @@ function gulpPrefixer(AWS) {
                 if(s3_params) {
                     objectOptions = helper.mergeOptions(objectOptions, s3_params);
                 }
-                
+
+                gutil.log(gutil.colors.cyan("Uploading:      "), keyname);
+
                 _s3.putObject(objectOptions, function(err, data) {
                     if(err) {
                         return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
@@ -95,13 +99,13 @@ function gulpPrefixer(AWS) {
                     if(getData) {
 
                         if(getData.ETag !== data.ETag) {
-                            gutil.log(gutil.colors.cyan("Updated..."), keyname);
+                            gutil.log(gutil.colors.yellow("Updated:        "), keyname);
                         } else {
-                            gutil.log(gutil.colors.gray("No Change..."), keyname);
+                            gutil.log(gutil.colors.gray("Not changed:    "), keyname);
                         }
 
                     } else {    // doesn't exist in bucket, it's new
-                        gutil.log(gutil.colors.cyan("Uploaded..."), keyname);
+                        gutil.log(gutil.colors.green("Uploaded:       "), keyname);
                     }
 
                     callback(null, file);
