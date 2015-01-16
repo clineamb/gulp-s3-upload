@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.0.1
+* Update to use headObject as reccomended by [pull request #6](https://github.com/clineamb/gulp-s3-upload/pull/6)
+* Update logging and colors.
+* Fix typos in Readme.
+
 ## Version 1.0
 * See changes beta-1.0 changes.
 * Added `uploadNewFilesOnly` flag option.

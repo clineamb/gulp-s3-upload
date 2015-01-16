@@ -13,7 +13,8 @@ This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 ## Usage
 
-Put in your AWS Developer key/secret. These are required, or else we don't have access to the bucket you want to upload to.
+Put in your AWS Developer key/secret. These are required, or else the plugin doesn't have access to the bucket you want to upload to.
+
 ```js
     var gulp = require('gulp');
     var s3 = require('gulp-s3-upload')({
@@ -23,9 +24,10 @@ Put in your AWS Developer key/secret. These are required, or else we don't have 
 ```
 The other options not mentioned above (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are `undefined`.
 
-`key` and `secret` are also alternative option names, though we encourage the use of `accessKeyId` and `secretAccessKey` to match the AWS Config Constructor.
+Option names `key` and `secret` are also alternative option names, though the use of `accessKeyId` and `secretAccessKey` are encouraged to match the AWS Config Constructor.
 
 Create a task.
+
 ```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
@@ -44,9 +46,9 @@ Type: `string`
 
 The bucket that the files will be uploaded to.
 
-Other available options are the same as the one found in the AWS-SDK docs for S3.  See below for a list of availble AWS-SDK resources that this plugin constantly references.
+Other available options are the same as the ones found in the AWS-SDK docs for S3.  The end of the readme below for a list of availble AWS-SDK resources that this plugin constantly references.
 
-**NOTE:** `Key`, `Body`, and `ContentType` are the only options availble in `putObject` that do NOT need to be defined because the gulp will handle these for you. If you define these accidentally, we will filter them out.
+**NOTE:** `Key`, `Body`, and `ContentType` are the only options availble in `putObject` that do **NOT** need to be defined because the gulp will handle these for you. If these are defined, the plugin will filter them out.
 
 ### gulp-s3-plugin options
 
@@ -56,6 +58,7 @@ Type: `function`
 
 Use this to transform your file names before they're uploaded to your S3 bucket.  
 (Previously known as `name_transform`).
+
 ```js
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
@@ -102,6 +105,7 @@ will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` 
 precedence and be added to each file being uploaded.
 
 Example (passing a `function`):
+
 ```js    
     // ... setup gulp-s3-upload ...
     var path = require('path');
@@ -127,6 +131,7 @@ Example (passing a `function`):
         }));
     });
 ```
+
 When passing a function, it's important to note that the file
 will already be transformed either by the `keyTransform` you defined
 or by the default function which creates a keyname relative to
@@ -134,7 +139,7 @@ your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
 depending on how it was structured locally (hence why in the example, 
 the `path` module is used to just get the filename).
 
-**Note:** You should be responsible for handling mismatching/non-matching keynames
+**Note:** You should be responsible for handling mismatching/unmatched keynames
 to the metadata you're mapping.
 
 #### mimeTypeLookup
@@ -142,6 +147,7 @@ to the metadata you're mapping.
 Type: `function`
 
 Use this to transform what the key that is used to match the MIME type when uploading to S3.
+
 ```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
