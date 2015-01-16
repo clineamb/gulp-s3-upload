@@ -14,19 +14,19 @@ This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 ## Usage
 
 Put in your AWS Developer key/secret. These are required, or else we don't have access to the bucket you want to upload to.
-
+```js
     var gulp = require('gulp');
     var s3 = require('gulp-s3-upload')({
         accessKeyId:        "YOUR DEV ID",
         secretAccessKey:    "YOUR SECRET"
     });
-
+```
 The other options not mentioned above (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are `undefined`.
 
 `key` and `secret` are also alternative option names, though we encourage the use of `accessKeyId` and `secretAccessKey` to match the AWS Config Constructor.
 
 Create a task.
-
+```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
             .pipe(s3({
@@ -35,7 +35,7 @@ Create a task.
             }))
         ;
     });
-
+```
 ## Options
 
 **Bucket (bucket)** *(required)*
@@ -50,14 +50,13 @@ Other available options are the same as the one found in the AWS-SDK docs for S3
 
 ### gulp-s3-plugin options
 
-
 #### keyTransform (nameTransform)
 
 Type: `function`
 
 Use this to transform your file names before they're uploaded to your S3 bucket.  
 (Previously known as `name_transform`).
-
+```js
     gulp.task("upload_transform", function() {
         gulp.src("./dir/to/upload/**")
             .pipe(s3({
@@ -71,7 +70,7 @@ Use this to transform your file names before they're uploaded to your S3 bucket.
             }))
         ;
     });
-
+```
 
 #### metadataMap
 
@@ -83,7 +82,7 @@ If you wish to change it per object, you can pass a function through
 to modify the metadata based on the (transformed) keyname.
 
 Example (passing an `object`):
-
+```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
@@ -95,7 +94,7 @@ Example (passing an `object`):
             }
         }));
     });
-
+```
 Passing the `s3.putObject` param option `Metadata` is effectively the same thing
 as passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not
 it will use the object passed to `Metadata` as metadata for all the files that
@@ -103,7 +102,7 @@ will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` 
 precedence and be added to each file being uploaded.
 
 Example (passing a `function`):
-    
+```js    
     // ... setup gulp-s3-upload ...
     var path = require('path');
     var metadata_collection = {
@@ -127,7 +126,7 @@ Example (passing a `function`):
             }
         }));
     });
-
+```
 When passing a function, it's important to note that the file
 will already be transformed either by the `keyTransform` you defined
 or by the default function which creates a keyname relative to
@@ -143,7 +142,7 @@ to the metadata you're mapping.
 Type: `function`
 
 Use this to transform what the key that is used to match the MIME type when uploading to S3.
-
+```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
         .pipe(s3({
@@ -154,7 +153,7 @@ Use this to transform what the key that is used to match the MIME type when uplo
             },
         }));
     });
-
+```
 
 #### uploadNewFilesOnly
 
