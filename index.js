@@ -88,7 +88,9 @@ gulpPrefixer = function(AWS) {
             } 
             //  options.Metdata is not filtered out later.
 
-            _s3.getObject({
+            gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
+
+            _s3.headObject({
                 Bucket: the_bucket
             ,   Key:    keyname
             }, function(getErr, getData) {
@@ -106,6 +108,7 @@ gulpPrefixer = function(AWS) {
                 objOpts.ContentType = mimetype;
                 
                 if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+
                     _s3.putObject(objOpts, function(err, data) {
                         if(err) {
                             return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
@@ -115,12 +118,12 @@ gulpPrefixer = function(AWS) {
 
                         if(getData) {
                             if(getData.ETag !== data.ETag) {
-                                gutil.log(gutil.colors.cyan("Updated....."), keyname);
+                                gutil.log(gutil.colors.yellow("Updated ......."), keyname);
                             } else {
-                                gutil.log(gutil.colors.gray("No Change..."), keyname);
+                                gutil.log(gutil.colors.gray("No Change ....."), keyname);
                             }
                         } else {    // doesn't exist in bucket, it's new
-                            gutil.log(file_count, gutil.colors.cyan ("Uploaded...."), keyname);
+                            gutil.log(gutil.colors.green("Uploaded! ....."), keyname);
                         }
                         
                         // callback(null, file);
