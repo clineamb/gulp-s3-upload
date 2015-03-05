@@ -30,7 +30,7 @@ gulpPrefixer = function(AWS) {
 
             var _stream = this,
                 keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name;
+                mimetype, mime_lookup_name, metadata;
 
 
             if(file.isNull()) {
@@ -81,9 +81,9 @@ gulpPrefixer = function(AWS) {
 
             if(!options.Metadata && options.metadataMap) {
                 if(helper.isMetadataMapFn(options.metadataMap)) {
-                    options.Metadata = options.metadataMap(keyname);
+                    metadata = options.metadataMap(keyname);
                 } else {
-                    options.Metadata  =  options.metadataMap;
+                    metadata  =  options.metadataMap;
                 }
             } 
             //  options.Metdata is not filtered out later.
@@ -106,6 +106,7 @@ gulpPrefixer = function(AWS) {
                 objOpts.Key = keyname;
                 objOpts.Body = file.contents;
                 objOpts.ContentType = mimetype;
+                objOpts.Metadata = metadata;
                 
                 if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
 
