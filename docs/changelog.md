@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 1.0.4
+* Forgot to add a Readme entry for `charset` option.
+
 ## Version 1.0.3
 * Allow charset option so S3 will give the correct Content-Type, as per [pull request #8](http://github.com/clineamb/gulp-s3-upload/pull/8)
 * Update some comments
