@@ -1,37 +1,37 @@
-var through = require('through2')
-,   gutil   = require('gulp-util')
-,   AWS     = require('aws-sdk')
-,   mime    = require('mime')
-,   helper  = require('./src/helper.js')
-,   PluginError = gutil.PluginError
-,   gulpPrefixer
-;
+var through = require('through2'),
+    gutil = require('gulp-util'),
+    AWS = require('aws-sdk'),
+    mime = require('mime'),
+    _ = require('underscore'),
+    helper = require('./src/helper.js'),
+    PluginError = gutil.PluginError,
+    gulpPrefixer;
 
 const PLUGIN_NAME = 'gulp-s3-upload';
 
-gulpPrefixer = function(AWS) {
-    /* 
+gulpPrefixer = function (AWS) {
+    /*
         `putObjectParams` now takes in the S3 putObject parameters:
             http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
         - will have a catch for `bucket` vs `Bucket`
         - Will filter out `Body` and `Key` because that is handled by the script and keyTransform
     */
-    return function(options) {
+    return function (options) {
 
         var stream, _s3 = new AWS.S3(),
             the_bucket = options.Bucket || options.bucket;
 
-        if(!the_bucket) {
+        if (!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
 
-        stream = through.obj(function(file, enc, callback) {
+        stream = through.obj(function (file, enc, callback) {
 
             var _stream = this,
                 keyTransform, keyname, keyparts, filename,
                 mimetype, mime_lookup_name, metadata;
 
-            if(file.isNull()) {
+            if (file.isNull()) {
                 //  Do nothing if no contents
                 return callback(null);
             }
@@ -49,7 +49,7 @@ gulpPrefixer = function(AWS) {
 
             keyTransform = options.keyTransform || options.nameTransform;
 
-            if(keyTransform) {
+            if (keyTransform) {
 
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
@@ -59,7 +59,7 @@ gulpPrefixer = function(AWS) {
 
                 // otherwise keep it exactly parallel
                 keyparts = helper.parsePath(file.relative);
-                keyname  = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
+                keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
 
             }
 
@@ -71,33 +71,37 @@ gulpPrefixer = function(AWS) {
 
             mime_lookup_name = keyname;
 
-            if(options.mimeTypeLookup) {
+            if (options.mimeTypeLookup) {
                 mime_lookup_name = options.mimeTypeLookup(keyname);
             }
-            
+
             mimetype = mime.lookup(mime_lookup_name);
 
+            // === Charset ===
+            if (options.charset && mimetype == 'text/html') {
+                mimetype += ';charset=' + options.charset;
+            }
 
             //  === metadataMap ===
             //  New in V1: Map your files (using the keyname) to a metadata object.
             //  ONLY if options.Metadata is undefined.
 
-            if(!options.Metadata && options.metadataMap) {
-                if(helper.isMetadataMapFn(options.metadataMap)) {
+            if (!options.Metadata && options.metadataMap) {
+                if (helper.isMetadataMapFn(options.metadataMap)) {
                     metadata = options.metadataMap(keyname);
                 } else {
-                    metadata  =  options.metadataMap;
+                    metadata = options.metadataMap;
                 }
-            } 
+            }
 
             //  options.Metadata is not filtered out later.
 
             gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
 
             _s3.headObject({
-                Bucket: the_bucket
-            ,   Key:    keyname
-            }, function(getErr, getData) {
+                Bucket: the_bucket,
+                Key: keyname
+            }, function (getErr, getData) {
 
                 var objOpts;
 
@@ -105,23 +109,23 @@ gulpPrefixer = function(AWS) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + getErr.message));
                 }
 
-                objOpts = helper.filterOptions(options); 
-                
-                objOpts.Bucket      = the_bucket;
-                objOpts.Key         = keyname;
-                objOpts.Body        = file.contents;
-                objOpts.ContentType = mimetype;
-                objOpts.Metadata    = metadata;
-                
-                if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
-                    _s3.putObject(objOpts, function(err, data) {
+                objOpts = helper.filterOptions(options);
 
-                        if(err) {
+                objOpts.Bucket = the_bucket;
+                objOpts.Key = keyname;
+                objOpts.Body = file.contents;
+                objOpts.ContentType = mimetype;
+                objOpts.Metadata = metadata;
+
+                if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+                    _s3.putObject(objOpts, function (err, data) {
+
+                        if (err) {
                             return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
                         }
 
-                        if(getData) {
-                            if(getData.ETag !== data.ETag) {
+                        if (getData) {
+                            if (getData.ETag !== data.ETag) {
                                 gutil.log(gutil.colors.yellow("Updated ......."), keyname);
                             } else {
                                 gutil.log(gutil.colors.gray("No Change ....."), keyname);
@@ -130,7 +134,7 @@ gulpPrefixer = function(AWS) {
                             // doesn't exist in bucket, the object is new to the bucket
                             gutil.log(gutil.colors.green("Uploaded! ....."), keyname);
                         }
-                        
+
                         callback(null);
                     });
                 }
@@ -145,14 +149,14 @@ gulpPrefixer = function(AWS) {
 // `config` now takes the paramters from the AWS-SDK constructor:
 // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
 
-module.exports = function(config) {
+module.exports = function (config) {
     var aws_config = config || {};
 
-    aws_config.accessKeyId      = config.accessKeyId || config.key;
-    aws_config.secretAccessKey  = config.secretAccessKey || config.secret;
+    aws_config.accessKeyId = config.accessKeyId || config.key;
+    aws_config.secretAccessKey = config.secretAccessKey || config.secret;
 
 
-    if(!aws_config.accessKeyId || !aws_config.secretAccessKey) {
+    if (!aws_config.accessKeyId || !aws_config.secretAccessKey) {
         throw new PluginError(PLUGIN_NAME, "Missing AWS Key & Secret.");
     }
 
