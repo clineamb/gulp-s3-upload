@@ -1,11 +1,12 @@
-var through = require('through2'),
-    gutil = require('gulp-util'),
-    AWS = require('aws-sdk'),
-    mime = require('mime'),
-    _ = require('underscore'),
-    helper = require('./src/helper.js'),
-    PluginError = gutil.PluginError,
-    gulpPrefixer;
+var through     = require('through2')
+,   gutil       = require('gulp-util')
+,   AWS         = require('aws-sdk')
+,   mime        = require('mime')
+,   _           = require('underscore')
+,   helper      = require('./src/helper.js')
+,   PluginError = gutil.PluginError
+,   gulpPrefixer
+;
 
 const PLUGIN_NAME = 'gulp-s3-upload';
 
@@ -21,7 +22,7 @@ gulpPrefixer = function (AWS) {
         var stream, _s3 = new AWS.S3(),
             the_bucket = options.Bucket || options.bucket;
 
-        if (!the_bucket) {
+        if(!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
 
@@ -31,12 +32,12 @@ gulpPrefixer = function (AWS) {
                 keyTransform, keyname, keyparts, filename,
                 mimetype, mime_lookup_name, metadata;
 
-            if (file.isNull()) {
+            if(file.isNull()) {
                 //  Do nothing if no contents
                 return callback(null);
             }
 
-            if (file.isStream()) {
+            if(file.isStream()) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
@@ -49,7 +50,7 @@ gulpPrefixer = function (AWS) {
 
             keyTransform = options.keyTransform || options.nameTransform;
 
-            if (keyTransform) {
+            if(keyTransform) {
 
                 // allow the transform function to take the complete path
                 // in case the user wants to change the path of the file, too.
@@ -71,23 +72,25 @@ gulpPrefixer = function (AWS) {
 
             mime_lookup_name = keyname;
 
-            if (options.mimeTypeLookup) {
+            if(options.mimeTypeLookup) {
                 mime_lookup_name = options.mimeTypeLookup(keyname);
             }
 
             mimetype = mime.lookup(mime_lookup_name);
 
             // === Charset ===
-            if (options.charset && mimetype == 'text/html') {
+            // Just in case text files get garbled. Appends to mimetype.
+            // `charset` field gets filtered out later.
+            if(options.charset && mimetype == 'text/html') {
                 mimetype += ';charset=' + options.charset;
             }
 
             //  === metadataMap ===
             //  New in V1: Map your files (using the keyname) to a metadata object.
-            //  ONLY if options.Metadata is undefined.
+            //  ONLY if `options.Metadata` is undefined.
 
-            if (!options.Metadata && options.metadataMap) {
-                if (helper.isMetadataMapFn(options.metadataMap)) {
+            if(!options.Metadata && options.metadataMap) {
+                if(helper.isMetadataMapFn(options.metadataMap)) {
                     metadata = options.metadataMap(keyname);
                 } else {
                     metadata = options.metadataMap;
@@ -99,33 +102,33 @@ gulpPrefixer = function (AWS) {
             gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
 
             _s3.headObject({
-                Bucket: the_bucket,
-                Key: keyname
+                'Bucket': the_bucket,
+                'Key':    keyname
             }, function (getErr, getData) {
 
                 var objOpts;
 
-                if (getErr && getErr.statusCode !== 404) {
+                if(getErr && getErr.statusCode !== 404) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + getErr.message));
                 }
 
                 objOpts = helper.filterOptions(options);
 
-                objOpts.Bucket = the_bucket;
-                objOpts.Key = keyname;
-                objOpts.Body = file.contents;
+                objOpts.Bucket      = the_bucket;
+                objOpts.Key         = keyname;
+                objOpts.Body        = file.contents;
                 objOpts.ContentType = mimetype;
-                objOpts.Metadata = metadata;
+                objOpts.Metadata    = metadata;
 
-                if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+                if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
                     _s3.putObject(objOpts, function (err, data) {
 
-                        if (err) {
+                        if(err) {
                             return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
                         }
 
-                        if (getData) {
-                            if (getData.ETag !== data.ETag) {
+                        if(getData) {
+                            if(getData.ETag !== data.ETag) {
                                 gutil.log(gutil.colors.yellow("Updated ......."), keyname);
                             } else {
                                 gutil.log(gutil.colors.gray("No Change ....."), keyname);
@@ -156,7 +159,7 @@ module.exports = function (config) {
     aws_config.secretAccessKey = config.secretAccessKey || config.secret;
 
 
-    if (!aws_config.accessKeyId || !aws_config.secretAccessKey) {
+    if(!aws_config.accessKeyId || !aws_config.secretAccessKey) {
         throw new PluginError(PLUGIN_NAME, "Missing AWS Key & Secret.");
     }
 

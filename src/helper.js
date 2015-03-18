@@ -1,16 +1,17 @@
 "use strict";
 
-var Path = require('path'),
-    _ = require('underscore');
+var Path    = require('path')
+,   _       = require('underscore')
+;
 
 module.exports = {
     parsePath: function (path) {
         var extname = Path.extname(path);
 
         return {
-            dirname: Path.dirname(path),
-            basename: Path.basename(path, extname),
-            extname: extname
+            'dirname':  Path.dirname(path),
+            'basename': Path.basename(path, extname),
+            'extname':  extname
         };
     },
 
@@ -21,7 +22,7 @@ module.exports = {
     filterOptions: function (params) {
         var omit_array = [
             'bucket',
-            'keyTransform',
+            'keyTransform'
             'nameTransform',
             'mimeTypeLookup',
             'metadataMap',
