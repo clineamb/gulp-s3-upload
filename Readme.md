@@ -52,6 +52,13 @@ Other available options are the same as the ones found in the AWS-SDK docs for S
 
 ### gulp-s3-plugin options
 
+### charset
+
+Type: `string`
+
+Use this to add a charset to the mimetype. `"charset=[CHARSET]"` gets appended to the mimetype if this is defined.
+
+
 #### keyTransform (nameTransform)
 
 Type: `function`
@@ -74,6 +81,7 @@ Use this to transform your file names before they're uploaded to your S3 bucket.
         ;
     });
 ```
+
 
 #### metadataMap
 
@@ -142,6 +150,7 @@ the `path` module is used to just get the filename).
 **Note:** You should be responsible for handling mismatching/unmatched keynames
 to the metadata you're mapping.
 
+
 #### mimeTypeLookup
 
 Type: `function`
@@ -160,6 +169,7 @@ Use this to transform what the key that is used to match the MIME type when uplo
         }));
     });
 ```
+
 
 #### uploadNewFilesOnly
 
