@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.3
+* Allow charset option so S3 will give the correct Content-Type, as per [pull request #8](http://github.com/clineamb/gulp-s3-upload/pull/8)
+* Update some comments
+
 ## Version 1.0.2
 
 * Put metadata into its own var to prevent mutation between files, as per [pull request #7](http://github.com/clineamb/gulp-s3-upload/pull/7)

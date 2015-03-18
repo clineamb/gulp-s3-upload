@@ -22,7 +22,7 @@ module.exports = {
     filterOptions: function (params) {
         var omit_array = [
             'bucket',
-            'keyTransform'
+            'keyTransform',
             'nameTransform',
             'mimeTypeLookup',
             'metadataMap',
