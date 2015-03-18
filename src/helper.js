@@ -1,27 +1,28 @@
 "use strict";
 
 var Path    = require('path')
-,   _       = require('underscore');
+,   _       = require('underscore')
+;
 
 module.exports = {
-    parsePath: function(path) {
+    parsePath: function (path) {
         var extname = Path.extname(path);
 
         return {
-            dirname:    Path.dirname(path),
-            basename:   Path.basename(path, extname),
-            extname:    extname
+            'dirname':  Path.dirname(path),
+            'basename': Path.basename(path, extname),
+            'extname':  extname
         };
     },
 
-    buildName: function(dirs, filename) {
+    buildName: function (dirs, filename) {
         return Path.join(dirs, filename);
     },
 
-    filterOptions: function(params) {
+    filterOptions: function (params) {
         var omit_array = [
             'bucket',
-            'keyTransform',
+            'keyTransform'
             'nameTransform',
             'mimeTypeLookup',
             'metadataMap',
@@ -29,13 +30,14 @@ module.exports = {
             'Body',
             'ContentType',
             'verbose',
-            'uploadNewFilesOnly'
+            'uploadNewFilesOnly',
+            'charset'
         ];
 
         return _.omit(params, omit_array);
     },
 
-    isMetadataMapFn: function(metadataMap) {
+    isMetadataMapFn: function (metadataMap) {
         return _.isFunction(metadataMap);
     }
 };
