@@ -13,30 +13,30 @@ This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 ## Usage
 
-Put in your AWS Developer key/secret. These are required, or else the plugin doesn't have access to the bucket you want to upload to.
-
 ```js
     var gulp = require('gulp');
-    var s3 = require('gulp-s3-upload')({
-        accessKeyId:        "YOUR DEV ID",
-        secretAccessKey:    "YOUR SECRET"
-    });
+    var s3 = require('gulp-s3-upload')(config);
 ```
-The other options not mentioned above (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property) are also available, though by default are `undefined`.
 
-Option names `key` and `secret` are also alternative option names, though the use of `accessKeyId` and `secretAccessKey` are encouraged to match the AWS Config Constructor.
+The optional `config` argument can include any option available (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property). By default all settings are undefined.
+
+Per AWS best practices, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp.
+
+```sh
+AWS_PROFILE=myprofile gulp
+```
 
 Create a task.
 
 ```js
-    gulp.task("upload", function() {
-        gulp.src("./dir/to/upload/**")
-            .pipe(s3({
-                Bucket: 'your-bucket-name', //  Required
-                ACL:    'public-read'       //  Needs to be user-defined
-            }))
-        ;
-    });
+gulp.task("upload", function() {
+    gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'your-bucket-name', //  Required
+            ACL:    'public-read'       //  Needs to be user-defined
+        }))
+    ;
+});
 ```
 ## Options
 
@@ -114,7 +114,7 @@ precedence and be added to each file being uploaded.
 
 Example (passing a `function`):
 
-```js    
+```js
     // ... setup gulp-s3-upload ...
     var path = require('path');
     var metadata_collection = {
@@ -144,7 +144,7 @@ When passing a function, it's important to note that the file
 will already be transformed either by the `keyTransform` you defined
 or by the default function which creates a keyname relative to
 your S3 bucket, e.g. you can get "example.txt" or "docs/example.txt"
-depending on how it was structured locally (hence why in the example, 
+depending on how it was structured locally (hence why in the example,
 the `path` module is used to just get the filename).
 
 **Note:** You should be responsible for handling mismatching/unmatched keynames
@@ -183,6 +183,7 @@ overwrite existing ones.
 ## AWS-SDK References
 
 * [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property)
+* [Configuring the AWS Node.js SDK](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
 * [S3 putObject](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property)
 * [Access Control List (ACL) Overview](http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html)
 
