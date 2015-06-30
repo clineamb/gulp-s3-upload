@@ -159,10 +159,6 @@ module.exports = function (config) {
     aws_config.secretAccessKey = config.secretAccessKey || config.secret;
 
 
-    if(!aws_config.accessKeyId || !aws_config.secretAccessKey) {
-        throw new PluginError(PLUGIN_NAME, "Missing AWS Key & Secret.");
-    }
-
     AWS.config.update(aws_config);
 
     return gulpPrefixer(AWS);
