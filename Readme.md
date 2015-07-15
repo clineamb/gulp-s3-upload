@@ -13,6 +13,8 @@ This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 ## Usage
 
+### Including + Setting Up Config
+
 ```js
     var gulp = require('gulp');
     var s3 = require('gulp-s3-upload')(config);
@@ -26,6 +28,13 @@ Per AWS best practices, the recommended approach for loading credentials is to u
 AWS_PROFILE=myprofile gulp
 ```
 
+You can also use a node_module like [config](https://www.npmjs.com/package/config) (+ [js-yaml](https://www.npmjs.com/package/js-yaml)) to load config files in your `gulpfile.js`.  You can also use `fs.readFileSync` to read from a local file to load your config.
+
+Feel free to also include credentials straight into your `gulpfile.js`, though be careful about committing files with secret credentials in your projects!
+
+
+### Gulp Task
+
 Create a task.
 
 ```js
@@ -38,6 +47,8 @@ gulp.task("upload", function() {
     ;
 });
 ```
+
+
 ## Options
 
 **Bucket (bucket)** *(required)*

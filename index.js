@@ -156,10 +156,13 @@ module.exports = function (config) {
     var aws_config = config || {};
 
     // Maintain backwards compatibility with legacy key and secret options
-    if (config.key)
-      aws_config.accessKeyId = config.key;
-    if (config.secret)
-      aws_config.secretAccessKey = config.secret;
+    if (config.key) {
+        aws_config.accessKeyId = config.key;
+    }
+
+    if (config.secret) {
+        aws_config.secretAccessKey = config.secret;
+    }
 
     // Intentionally not mandating the accessKeyId and secretAccessKey as they
     // will be loaded automatically by the SDK from either environment variables
@@ -168,17 +171,18 @@ module.exports = function (config) {
 
     // Configure the proxy if an environment variable is present.
     if (process.env.HTTPS_PROXY) {
-      gutil.log("setting https proxy to %s", process.env.HTTPS_PROXY);
-      if (!aws_config.httpOptions)
+        gutil.log("setting https proxy to %s", process.env.HTTPS_PROXY);
+        if (!aws_config.httpOptions)
         aws_config.httpOptions = {};
 
-      var HttpsProxyAgent = require('https-proxy-agent');
-      aws_config.httpOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
+        var HttpsProxyAgent = require('https-proxy-agent');
+        aws_config.httpOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
     }
 
     // Update the global AWS config if we have any overrides
-    if (Object.keys(aws_config).length)
-      AWS.config.update(aws_config);
+    if (Object.keys(aws_config).length) {
+        AWS.config.update(aws_config);
+    }
 
     return gulpPrefixer(AWS);
 };
