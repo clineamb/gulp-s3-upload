@@ -32,6 +32,8 @@ You can also use a node_module like [config](https://www.npmjs.com/package/confi
 
 Feel free to also include credentials straight into your `gulpfile.js`, though be careful about committing files with secret credentials in your projects!
 
+Having AWS Key/Secrets may not be required by your AWS/IAM settings.  Errors thrown by the request should give your permission errors.
+
 
 ### Gulp Task
 
