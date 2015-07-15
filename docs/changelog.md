@@ -2,6 +2,7 @@
 
 ## Version 1.0.5
 * Added SDK config discovery + https_proxy support from [pull request #12](https://github.com/clineamb/gulp-s3-upload/pull/12).
+* Removed requirement to have AWS Key/Secret (due to settings be in IAM), as per [pull request #13](https://github.com/clineamb/gulp-s3-upload/pull/13).
 
 ## Version 1.0.4
 * Forgot to add a Readme entry for `charset` option.
