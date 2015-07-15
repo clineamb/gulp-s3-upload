@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 1.0.5
+* Added SDK config discovery + https_proxy support from [pull request #12](https://github.com/clineamb/gulp-s3-upload/pull/12).
+
 ## Version 1.0.4
 * Forgot to add a Readme entry for `charset` option.
 

@@ -109,7 +109,7 @@ gulpPrefixer = function (AWS) {
                 var objOpts;
 
                 if(getErr && getErr.statusCode !== 404) {
-                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + getErr.message));
+                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
                 }
 
                 objOpts = helper.filterOptions(options);
@@ -124,7 +124,7 @@ gulpPrefixer = function (AWS) {
                     _s3.putObject(objOpts, function (err, data) {
 
                         if(err) {
-                            return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Error: " + err.message));
+                            return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
                         }
 
                         if(getData) {
@@ -155,15 +155,34 @@ gulpPrefixer = function (AWS) {
 module.exports = function (config) {
     var aws_config = config || {};
 
-    aws_config.accessKeyId = config.accessKeyId || config.key;
-    aws_config.secretAccessKey = config.secretAccessKey || config.secret;
-
-
-    if(!aws_config.accessKeyId || !aws_config.secretAccessKey) {
-        throw new PluginError(PLUGIN_NAME, "Missing AWS Key & Secret.");
+    // Maintain backwards compatibility with legacy key and secret options
+    if (config.key) {
+        aws_config.accessKeyId = config.key;
     }
 
-    AWS.config.update(aws_config);
+    if (config.secret) {
+        aws_config.secretAccessKey = config.secret;
+    }
+
+    // Intentionally not mandating the accessKeyId and secretAccessKey as they
+    // will be loaded automatically by the SDK from either environment variables
+    // or the credentials file.
+    // http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
+
+    // Configure the proxy if an environment variable is present.
+    if (process.env.HTTPS_PROXY) {
+        gutil.log("setting https proxy to %s", process.env.HTTPS_PROXY);
+        if (!aws_config.httpOptions)
+        aws_config.httpOptions = {};
+
+        var HttpsProxyAgent = require('https-proxy-agent');
+        aws_config.httpOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
+    }
+
+    // Update the global AWS config if we have any overrides
+    if (Object.keys(aws_config).length) {
+        AWS.config.update(aws_config);
+    }
 
     return gulpPrefixer(AWS);
 };
