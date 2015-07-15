@@ -184,5 +184,7 @@ module.exports = function (config) {
         AWS.config.update(aws_config);
     }
 
+    AWS.config.update(aws_config);
+
     return gulpPrefixer(AWS);
 };
