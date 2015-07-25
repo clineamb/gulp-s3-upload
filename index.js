@@ -4,6 +4,7 @@ var through     = require('through2')
 ,   mime        = require('mime')
 ,   _           = require('underscore')
 ,   helper      = require('./src/helper.js')
+,   md5         = require('md5')
 ,   PluginError = gutil.PluginError
 ,   gulpPrefixer
 ;
@@ -110,6 +111,11 @@ gulpPrefixer = function (AWS) {
 
                 if(getErr && getErr.statusCode !== 404) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
+                }
+
+                if(getData && getData.ETag === '"' + md5(file.contents) + '"') {
+                    gutil.log(gutil.colors.magenta("No Change ....."), keyname);
+                    return callback(null);
                 }
 
                 objOpts = helper.filterOptions(options);
