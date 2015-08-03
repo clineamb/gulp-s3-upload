@@ -4,6 +4,7 @@ var es          = require('event-stream')
 ,   mime        = require('mime')
 ,   _           = require('underscore')
 ,   helper      = require('./src/helper.js')
+,   hasha       = require('hasha')
 ,   PluginError = gutil.PluginError
 ,   gulpPrefixer
 ;
@@ -41,106 +42,118 @@ gulpPrefixer = function (AWS) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
-            //  ===== METHOD TRANSFORMS & LOOKUPS =====
-            //  =======================================
+            hasha.fromStream(file, { algorithm: 'md5'}, function (err, hash) {
+                if (err) {
+                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 hasha Error: " + err.stack));
+                }
 
-            //  === Key transform ===
-            //  Allow for either keyTransform or nameTransform.
-            //  We're using Key to be consistent with AWS-S3.
+                //  ===== METHOD TRANSFORMS & LOOKUPS =====
+                //  =======================================
 
-            keyTransform = options.keyTransform || options.nameTransform;
+                //  === Key transform ===
+                //  Allow for either keyTransform or nameTransform.
+                //  We're using Key to be consistent with AWS-S3.
 
-            if(keyTransform) {
+                keyTransform = options.keyTransform || options.nameTransform;
 
-                // allow the transform function to take the complete path
-                // in case the user wants to change the path of the file, too.
-                keyname = keyTransform(file.relative);
+                if (keyTransform) {
 
-            } else {
+                    // allow the transform function to take the complete path
+                    // in case the user wants to change the path of the file, too.
+                    keyname = keyTransform(file.relative);
 
-                // otherwise keep it exactly parallel
-                keyparts = helper.parsePath(file.relative);
-                keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
-
-            }
-
-            // just in case user is on windows that uses backslashes
-            keyname = keyname.replace(/\\/g, "/");
-
-
-            // === Mime Lookup/Transform ===
-
-            mime_lookup_name = keyname;
-
-            if(options.mimeTypeLookup) {
-                mime_lookup_name = options.mimeTypeLookup(keyname);
-            }
-
-            mimetype = mime.lookup(mime_lookup_name);
-
-            // === Charset ===
-            // Just in case text files get garbled. Appends to mimetype.
-            // `charset` field gets filtered out later.
-            if(options.charset && mimetype == 'text/html') {
-                mimetype += ';charset=' + options.charset;
-            }
-
-            //  === metadataMap ===
-            //  New in V1: Map your files (using the keyname) to a metadata object.
-            //  ONLY if `options.Metadata` is undefined.
-
-            if(!options.Metadata && options.metadataMap) {
-                if(helper.isMetadataMapFn(options.metadataMap)) {
-                    metadata = options.metadataMap(keyname);
                 } else {
-                    metadata = options.metadataMap;
-                }
-            }
 
-            //  options.Metadata is not filtered out later.
+                    // otherwise keep it exactly parallel
+                    keyparts = helper.parsePath(file.relative);
+                    keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
 
-            gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
-
-            _s3.headObject({
-                'Bucket': the_bucket,
-                'Key':    keyname
-            }, function (getErr, getData) {
-
-                var objOpts;
-
-                if(getErr && getErr.statusCode !== 404) {
-                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
                 }
 
-                objOpts = helper.filterOptions(options);
+                // just in case user is on windows that uses backslashes
+                keyname = keyname.replace(/\\/g, "/");
 
-                objOpts.Bucket      = the_bucket;
-                objOpts.Key         = keyname;
-                objOpts.Body        = file.contents;
-                objOpts.ContentType = mimetype;
-                objOpts.Metadata    = metadata;
 
-                if(options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
-                    _s3.putObject(objOpts, function (err, data) {
+                // === Mime Lookup/Transform ===
 
-                        if(err) {
-                            return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
-                        }
+                mime_lookup_name = keyname;
 
-                        if(getData) {
-                            if(getData.ETag !== data.ETag) {
-                                gutil.log(gutil.colors.yellow("Updated ......."), keyname);
-                            } else {
-                                gutil.log(gutil.colors.gray("No Change ....."), keyname);
+                if (options.mimeTypeLookup) {
+                    mime_lookup_name = options.mimeTypeLookup(keyname);
+                }
+
+                mimetype = mime.lookup(mime_lookup_name);
+
+                // === Charset ===
+                // Just in case text files get garbled. Appends to mimetype.
+                // `charset` field gets filtered out later.
+                if (options.charset && mimetype == 'text/html') {
+                    mimetype += ';charset=' + options.charset;
+                }
+
+                //  === metadataMap ===
+                //  New in V1: Map your files (using the keyname) to a metadata object.
+                //  ONLY if `options.Metadata` is undefined.
+
+                if (!options.Metadata && options.metadataMap) {
+                    if (helper.isMetadataMapFn(options.metadataMap)) {
+                        metadata = options.metadataMap(keyname);
+                    } else {
+                        metadata = options.metadataMap;
+                    }
+                }
+
+                //  options.Metadata is not filtered out later.
+
+                _s3.headObject({
+                    'Bucket': the_bucket,
+                    'Key': keyname
+                }, function (getErr, getData) {
+
+                    var objOpts;
+
+                    if (getErr && getErr.statusCode !== 404) {
+                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
+                    }
+
+                    if (getData && getData.ETag === '"' + hash + '"') {
+                        gutil.log(gutil.colors.magenta("No Change ....."), keyname);
+                        return callback(null);
+                    }
+
+                    objOpts = helper.filterOptions(options);
+
+                    objOpts.Bucket = the_bucket;
+                    objOpts.Key = keyname;
+                    objOpts.Body = file.contents;
+                    objOpts.ContentType = mimetype;
+                    objOpts.Metadata = metadata;
+
+                    if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+
+                        gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
+
+                        _s3.putObject(objOpts, function (err, data) {
+
+                            if (err) {
+                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
                             }
-                        } else {
-                            // doesn't exist in bucket, the object is new to the bucket
-                            gutil.log(gutil.colors.green("Uploaded! ....."), keyname);
-                        }
 
-                        callback(null);
-                    });
-                }
+                            if (getData) {
+                                if (getData.ETag !== data.ETag) {
+                                    gutil.log(gutil.colors.yellow("Updated ......."), keyname);
+                                } else {
+                                    gutil.log(gutil.colors.gray("No Change ....."), keyname);
+                                }
+                            } else {
+                                // doesn't exist in bucket, the object is new to the bucket
+                                gutil.log(gutil.colors.green("Uploaded! ....."), keyname);
+                            }
+
+                            callback(null);
+                        });
+                    }
+                });
             });
         });
 
