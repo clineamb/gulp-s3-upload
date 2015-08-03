@@ -22,14 +22,16 @@ gulpPrefixer = function (AWS) {
 
     return function (options) {
 
-        var stream, _s3 = new AWS.S3(),
-            the_bucket = options.Bucket || options.bucket
+        var stream, _s3 = new AWS.S3()
+        ,   the_bucket  = options.Bucket || options.bucket
         ;
 
         if(!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
 
+        //  *NEW* in v1.1.0 - Async File Uploading
+        
         stream = es.map(function (file, callback) {
 
             var _stream = this,
@@ -37,12 +39,15 @@ gulpPrefixer = function (AWS) {
                 mimetype, mime_lookup_name, metadata
             ;
 
+            file_counts.total++;
+
             if(file.isNull()) {
                 //  Do nothing if no contents
                 return callback(null);
             }
 
             if(file.isStream()) {
+                //  Not supporting streams (for now?).
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
@@ -137,7 +142,7 @@ gulpPrefixer = function (AWS) {
 
                     if(getData && getData.ETag === '"' + hash + '"') {
                         //  AWS ETag doesn't match local ETag
-
+                        file_counts.unchanged++;
                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
                         callback(null);
 
@@ -163,12 +168,15 @@ gulpPrefixer = function (AWS) {
                                 if (getData) {
                                     if (getData.ETag !== data.ETag) {
                                         gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
+                                        file_counts.updated++;
                                     } else {
                                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                                        file_counts.unchanged++;
                                     }
                                 } else {
                                     // doesn't exist in bucket, the object is new to the bucket
                                     gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                                    file_counts.new++;
                                 }
 
                                 callback(null);
