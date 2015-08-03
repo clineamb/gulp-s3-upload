@@ -1,6 +1,7 @@
 var es          = require('event-stream')
 ,   gutil       = require('gulp-util')
 ,   AWS         = require('aws-sdk')
+,   path        = require('path')
 ,   mime        = require('mime')
 ,   hasha       = require('hasha')
 ,   _           = require('underscore')
@@ -22,7 +23,8 @@ gulpPrefixer = function (AWS) {
     return function (options) {
 
         var stream, _s3 = new AWS.S3(),
-            the_bucket = options.Bucket || options.bucket;
+            the_bucket = options.Bucket || options.bucket
+        ;
 
         if(!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
@@ -43,6 +45,7 @@ gulpPrefixer = function (AWS) {
             if(file.isStream()) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
+
 
             //  =====================================================
             //  ============= METHOD TRANSFORMS & LOOKUPS ===========
@@ -112,7 +115,7 @@ gulpPrefixer = function (AWS) {
                 options.etag_hash = 'md5';
             }
 
-            hasha.fromStream(file,
+            hasha.fromFile(path.join(file.base, file.relative),
                 {'algorithm': options.etag_hash}, function (hasha_err, hash) {
 
                 if(hasha_err) {
@@ -133,42 +136,44 @@ gulpPrefixer = function (AWS) {
                     }
 
                     if(getData && getData.ETag === '"' + hash + '"') {
-                        gutil.log(gutil.colors.magenta("No Change ....."), keyname);
+                        //  AWS ETag doesn't match local ETag
 
-                        return callback(null);
-                    }
+                        gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                        callback(null);
 
-                    objOpts = helper.filterOptions(options);
+                    } else {
+                        objOpts = helper.filterOptions(options);
 
-                    objOpts.Bucket      = the_bucket;
-                    objOpts.Key         = keyname;
-                    objOpts.Body        = file.contents;
-                    objOpts.ContentType = mimetype;
-                    objOpts.Metadata    = metadata;
+                        objOpts.Bucket      = the_bucket;
+                        objOpts.Key         = keyname;
+                        objOpts.Body        = file.contents;
+                        objOpts.ContentType = mimetype;
+                        objOpts.Metadata    = metadata;
 
-                    if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+                        if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
 
-                        gutil.log(gutil.colors.cyan("Uploading ....."), keyname);
+                            gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
-                        _s3.putObject(objOpts, function (err, data) {
+                            _s3.putObject(objOpts, function (err, data) {
 
-                            if (err) {
-                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
-                            }
-
-                            if (getData) {
-                                if (getData.ETag !== data.ETag) {
-                                    gutil.log(gutil.colors.yellow("Updated ......."), keyname);
-                                } else {
-                                    gutil.log(gutil.colors.gray("No Change ....."), keyname);
+                                if (err) {
+                                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
                                 }
-                            } else {
-                                // doesn't exist in bucket, the object is new to the bucket
-                                gutil.log(gutil.colors.green("Uploaded! ....."), keyname);
-                            }
 
-                            callback(null);
-                        });
+                                if (getData) {
+                                    if (getData.ETag !== data.ETag) {
+                                        gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
+                                    } else {
+                                        gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                                    }
+                                } else {
+                                    // doesn't exist in bucket, the object is new to the bucket
+                                    gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                                }
+
+                                callback(null);
+                            });
+                        }
                     }
                 });
             });
@@ -186,11 +191,11 @@ module.exports = function (config) {
     var aws_config = config || {};
 
     // Maintain backwards compatibility with legacy key and secret options
-    if (config.key) {
+    if(config.key) {
         aws_config.accessKeyId = config.key;
     }
 
-    if (config.secret) {
+    if(config.secret) {
         aws_config.secretAccessKey = config.secret;
     }
 
@@ -200,17 +205,20 @@ module.exports = function (config) {
     // http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
 
     // Configure the proxy if an environment variable is present.
-    if (process.env.HTTPS_PROXY) {
+    if(process.env.HTTPS_PROXY) {
         gutil.log("setting https proxy to %s", process.env.HTTPS_PROXY);
-        if (!aws_config.httpOptions)
-        aws_config.httpOptions = {};
+
+        if(!aws_config.httpOptions) {
+            aws_config.httpOptions = {};
+        }
 
         var HttpsProxyAgent = require('https-proxy-agent');
+
         aws_config.httpOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
     }
 
     // Update the global AWS config if we have any overrides
-    if (Object.keys(aws_config).length) {
+    if(Object.keys(aws_config).length) {
         AWS.config.update(aws_config);
     }
 

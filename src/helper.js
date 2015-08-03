@@ -31,7 +31,8 @@ module.exports = {
             'ContentType',
             'verbose',
             'uploadNewFilesOnly',
-            'charset'
+            'charset',
+            'etag_hash'
         ];
 
         return _.omit(params, omit_array);
