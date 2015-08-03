@@ -2,9 +2,9 @@ var es          = require('event-stream')
 ,   gutil       = require('gulp-util')
 ,   AWS         = require('aws-sdk')
 ,   mime        = require('mime')
+,   hasha       = require('hasha')
 ,   _           = require('underscore')
 ,   helper      = require('./src/helper.js')
-,   hasha       = require('hasha')
 ,   PluginError = gutil.PluginError
 ,   gulpPrefixer
 ;
@@ -18,6 +18,7 @@ gulpPrefixer = function (AWS) {
         - will have a catch for `bucket` vs `Bucket`
         - Will filter out `Body` and `Key` because that is handled by the script and keyTransform
     */
+
     return function (options) {
 
         var stream, _s3 = new AWS.S3(),
@@ -31,7 +32,8 @@ gulpPrefixer = function (AWS) {
 
             var _stream = this,
                 keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name, metadata;
+                mimetype, mime_lookup_name, metadata
+            ;
 
             if(file.isNull()) {
                 //  Do nothing if no contents
@@ -42,68 +44,80 @@ gulpPrefixer = function (AWS) {
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
-            hasha.fromStream(file, { algorithm: 'md5'}, function (err, hash) {
-                if (err) {
+            //  =====================================================
+            //  ============= METHOD TRANSFORMS & LOOKUPS ===========
+            //  =====================================================
+
+            //  === Key transform ===
+            //  Allow for either keyTransform or nameTransform.
+            //  We're using Key to be consistent with AWS-S3.
+
+            keyTransform = options.keyTransform || options.nameTransform;
+
+            if(keyTransform) {
+
+                // Allow the transform function to take the complete path
+                // in case the user wants to change the path of the file, too.
+                keyname = keyTransform(file.relative);
+
+            } else {
+                // otherwise keep it exactly parallel
+                keyparts = helper.parsePath(file.relative);
+                keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
+            }
+
+            
+            keyname = keyname.replace(/\\/g, "/"); // JIC Windows (uses backslashes)
+
+
+            // === Mime Lookup/Transform ============================
+
+            mime_lookup_name = keyname;
+
+            if (options.mimeTypeLookup) {
+                mime_lookup_name = options.mimeTypeLookup(keyname);
+            }
+
+            mimetype = mime.lookup(mime_lookup_name);
+
+            // === Charset ==========================================
+            // JIC text files get garbled. Appends to mimetype.
+            // `charset` field gets filtered out later.
+            if (options.charset && mimetype == 'text/html') {
+                mimetype += ';charset=' + options.charset;
+            }
+
+            //  === metadataMap =====================================
+            //  Map files (using the keyname) to a metadata object.
+            //  ONLY if `options.Metadata` is undefined.
+
+            if (!options.Metadata && options.metadataMap) {
+                if (helper.isMetadataMapFn(options.metadataMap)) {
+                    metadata = options.metadataMap(keyname);
+                } else {
+                    metadata = options.metadataMap;
+                }
+            }
+
+            //  ETag Hash Comparison ================================
+            //  *NEW* in 1.1.0; do a local hash comparison to reduce
+            //  the overhead from calling upload anyway.
+            //  Add the option for a different algorithm, JIC for 
+            //  some reason the algorithm is not MD5.
+            //  Available algorithms are from hasha:
+            //  http://github.com/sindresorhus/hasha
+
+            // options.etag_hash = 'md5';
+
+
+
+            hasha.fromStream(file, { 'algorithm': 'md5'}, function (hasha_err, hash) {
+
+                if(hasha_err) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 hasha Error: " + err.stack));
                 }
 
-                //  ===== METHOD TRANSFORMS & LOOKUPS =====
-                //  =======================================
-
-                //  === Key transform ===
-                //  Allow for either keyTransform or nameTransform.
-                //  We're using Key to be consistent with AWS-S3.
-
-                keyTransform = options.keyTransform || options.nameTransform;
-
-                if (keyTransform) {
-
-                    // allow the transform function to take the complete path
-                    // in case the user wants to change the path of the file, too.
-                    keyname = keyTransform(file.relative);
-
-                } else {
-
-                    // otherwise keep it exactly parallel
-                    keyparts = helper.parsePath(file.relative);
-                    keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
-
-                }
-
-                // just in case user is on windows that uses backslashes
-                keyname = keyname.replace(/\\/g, "/");
-
-
-                // === Mime Lookup/Transform ===
-
-                mime_lookup_name = keyname;
-
-                if (options.mimeTypeLookup) {
-                    mime_lookup_name = options.mimeTypeLookup(keyname);
-                }
-
-                mimetype = mime.lookup(mime_lookup_name);
-
-                // === Charset ===
-                // Just in case text files get garbled. Appends to mimetype.
-                // `charset` field gets filtered out later.
-                if (options.charset && mimetype == 'text/html') {
-                    mimetype += ';charset=' + options.charset;
-                }
-
-                //  === metadataMap ===
-                //  New in V1: Map your files (using the keyname) to a metadata object.
-                //  ONLY if `options.Metadata` is undefined.
-
-                if (!options.Metadata && options.metadataMap) {
-                    if (helper.isMetadataMapFn(options.metadataMap)) {
-                        metadata = options.metadataMap(keyname);
-                    } else {
-                        metadata = options.metadataMap;
-                    }
-                }
-
-                //  options.Metadata is not filtered out later.
+                //  *Note: options.Metadata is not filtered out later.
 
                 _s3.headObject({
                     'Bucket': the_bucket,
@@ -112,22 +126,23 @@ gulpPrefixer = function (AWS) {
 
                     var objOpts;
 
-                    if (getErr && getErr.statusCode !== 404) {
+                    if(getErr && getErr.statusCode !== 404) {
                         return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
                     }
 
-                    if (getData && getData.ETag === '"' + hash + '"') {
+                    if(getData && getData.ETag === '"' + hash + '"') {
                         gutil.log(gutil.colors.magenta("No Change ....."), keyname);
+
                         return callback(null);
                     }
 
                     objOpts = helper.filterOptions(options);
 
-                    objOpts.Bucket = the_bucket;
-                    objOpts.Key = keyname;
-                    objOpts.Body = file.contents;
+                    objOpts.Bucket      = the_bucket;
+                    objOpts.Key         = keyname;
+                    objOpts.Body        = file.contents;
                     objOpts.ContentType = mimetype;
-                    objOpts.Metadata = metadata;
+                    objOpts.Metadata    = metadata;
 
                     if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
 
