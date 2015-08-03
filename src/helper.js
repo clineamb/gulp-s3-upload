@@ -21,18 +21,18 @@ module.exports = {
 
     filterOptions: function (params) {
         var omit_array = [
-            'bucket',
-            'keyTransform',
-            'nameTransform',
-            'mimeTypeLookup',
-            'metadataMap',
-            'Key',
             'Body',
-            'ContentType',
-            'verbose',
-            'uploadNewFilesOnly',
+            'bucket',
             'charset',
+            'ContentType',
             'etag_hash'
+            'Key',
+            'keyTransform',
+            'metadataMap',
+            'mimeTypeLookup',
+            'nameTransform',
+            'uploadNewFilesOnly',
+            'verbose'
         ];
 
         return _.omit(params, omit_array);

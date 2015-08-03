@@ -31,7 +31,7 @@ gulpPrefixer = function (AWS) {
         }
 
         //  *NEW* in v1.1.0 - Async File Uploading
-        
+
         stream = es.map(function (file, callback) {
 
             var _stream = this,
@@ -71,7 +71,7 @@ gulpPrefixer = function (AWS) {
             } else {
                 // otherwise keep it exactly parallel
                 keyparts = helper.parsePath(file.relative);
-                keyname = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
+                keyname  = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
             }
 
             
