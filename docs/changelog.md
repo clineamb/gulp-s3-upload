@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 1.1.0
+
+* Added better ETag (AWS vs. local) comparison from [pull request #16](https://github.com/clineamb/gulp-s3-upload/pull/16)
+  * Added option `etag_hash` just in case AWS ETag comparison is not MD5 algorithm.  [More info here.](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html)
+* **Plugin is now ASYNC!**
+  * @thomaswelton beat me to the punch, but I've added it (and the ETag comparing) to be the first feature in our next minor version! Horray!
+  * From [pull request #14](https://github.com/clineamb/gulp-s3-upload/pull/14)
+* Updated Readme, cleaned up code.
+
 ## Version 1.0.5
 * Added SDK config discovery + https_proxy support from [pull request #12](https://github.com/clineamb/gulp-s3-upload/pull/12).
 * Removed requirement to have AWS Key/Secret (due to settings be in IAM), as per [pull request #13](https://github.com/clineamb/gulp-s3-upload/pull/13).
