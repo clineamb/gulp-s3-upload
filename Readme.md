@@ -1,4 +1,5 @@
 # gulp-s3-upload
+__Version 1.1.0__
 
 Use for uploading assets to Amazon S3 servers.  
 This helps to make it an easy gulp task.
@@ -6,6 +7,12 @@ This helps to make it an easy gulp task.
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 [NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](docs/changelog.md)
+
+### What's New in 1.1.0
+*  File uploading is now Asynchronus!
+*  Reduced overhead in checking if a file is new.
+
+__See full details in the [Changelog](docs/changelog.md).__
 
 ## Install
 
@@ -70,6 +77,14 @@ Other available options are the same as the ones found in the AWS-SDK docs for S
 Type: `string`
 
 Use this to add a charset to the mimetype. `"charset=[CHARSET]"` gets appended to the mimetype if this is defined.
+
+### etag_hash 
+
+Type: `string`
+
+Default: `'md5'`
+
+Use this to change the hashing of the files' ETags. The default is MD5.  More information on AWS's [Common Response Headers can be found here](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html).  You shouldn't have to change this, but AWS says the "ETag may or may not be an MD5 diest of the object data", so this option has been implemented should any other case arise. 
 
 
 #### keyTransform (nameTransform)
