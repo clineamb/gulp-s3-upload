@@ -1,4 +1,4 @@
-var through     = require('through2')
+var es          = require('event-stream')
 ,   gutil       = require('gulp-util')
 ,   AWS         = require('aws-sdk')
 ,   mime        = require('mime')
@@ -26,7 +26,7 @@ gulpPrefixer = function (AWS) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
 
-        stream = through.obj(function (file, enc, callback) {
+        stream = es.map(function (file, callback) {
 
             var _stream = this,
                 keyTransform, keyname, keyparts, filename,
