@@ -104,14 +104,16 @@ gulpPrefixer = function (AWS) {
             //  the overhead from calling upload anyway.
             //  Add the option for a different algorithm, JIC for 
             //  some reason the algorithm is not MD5.
-            //  Available algorithms are from hasha:
-            //  http://github.com/sindresorhus/hasha
+            //  Available algorithms are those available w/
+            //  default node `crypto` plugin. (run `crypto.getCiphers()`)
 
-            // options.etag_hash = 'md5';
+            if(!options.etag_hash) {
+                //  If not defined, default to md5
+                options.etag_hash = 'md5';
+            }
 
-
-
-            hasha.fromStream(file, { 'algorithm': 'md5'}, function (hasha_err, hash) {
+            hasha.fromStream(file,
+                {'algorithm': options.etag_hash}, function (hasha_err, hash) {
 
                 if(hasha_err) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 hasha Error: " + err.stack));
