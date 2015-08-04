@@ -8,7 +8,7 @@ This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 [NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](docs/changelog.md)
 
-### What's New in 1.1.0
+### What's New in 1.1
 *  File uploading is now Asynchronus!
 *  Reduced overhead in checking if a file is new.
 

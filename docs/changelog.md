@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 1.1.1
+* Bugfix -- Missing comma. Fixed in [pull request #17](https://github.com/clineamb/gulp-s3-upload/pull/17)
+
 
 ## Version 1.1.0
 
