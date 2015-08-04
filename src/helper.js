@@ -25,7 +25,7 @@ module.exports = {
             'bucket',
             'charset',
             'ContentType',
-            'etag_hash'
+            'etag_hash',
             'Key',
             'keyTransform',
             'metadataMap',
