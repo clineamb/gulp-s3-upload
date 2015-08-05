@@ -1,6 +1,14 @@
 # Changelog
 
+
+## Version 1.1.2
+
+* Bugfix -- Remove unused `file_counts` variable.
+* Clean up some indents and codes.
+
+
 ## Version 1.1.1
+
 * Bugfix -- Missing comma. Fixed in [pull request #17](https://github.com/clineamb/gulp-s3-upload/pull/17)
 
 
