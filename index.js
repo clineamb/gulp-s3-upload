@@ -13,16 +13,11 @@ var es          = require('event-stream')
 const PLUGIN_NAME = 'gulp-s3-upload';
 
 gulpPrefixer = function (AWS) {
-    /*
-        `putObjectParams` now takes in the S3 putObject parameters:
-            http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
-        - will have a catch for `bucket` vs `Bucket`
-        - Will filter out `Body` and `Key` because that is handled by the script and keyTransform
-    */
 
     return function (options) {
 
-        var stream, _s3 = new AWS.S3()
+        var stream
+        ,   _s3         = new AWS.S3()
         ,   the_bucket  = options.Bucket || options.bucket
         ;
 
@@ -53,11 +48,11 @@ gulpPrefixer = function (AWS) {
             //  ============= METHOD TRANSFORMS & LOOKUPS ===========
             //  =====================================================
 
-            //  === Key transform ===
+            //  === Key Transform ===================================
             //  Allow for either keyTransform or nameTransform.
             //  We're using Key to be consistent with AWS-S3.
 
-            keyTransform = options.keyTransform || options.nameTransform;
+            keyTransform = options.keyTransform || options.nameTransform;   // old option name
 
             if(keyTransform) {
 
@@ -110,7 +105,7 @@ gulpPrefixer = function (AWS) {
             }
 
             //  === ETag Hash Comparison =============================
-            //  *NEW* in 1.1.0; do a local hash comparison to reduce
+            //  *NEW* in 1.1; do a local hash comparison to reduce
             //  the overhead from calling upload anyway.
             //  Add the option for a different algorithm, JIC for 
             //  some reason the algorithm is not MD5.
@@ -118,10 +113,8 @@ gulpPrefixer = function (AWS) {
             //  node `crypto` plugin. (run `crypto.getCiphers()`)
 
             if(!options.etag_hash) {
-
                 //  If not defined, default to md5
                 options.etag_hash = 'md5';
-
             }
 
             hasha.fromFile(path.join(file.base, file.relative),
@@ -131,7 +124,7 @@ gulpPrefixer = function (AWS) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 hasha Error: " + err.stack));
                 }
 
-                //  *Note: options.Metadata is not filtered out later.
+                //  *Note: `options.Metadata` is not filtered out later.
 
                 _s3.headObject({
                     'Bucket': the_bucket,
@@ -145,7 +138,7 @@ gulpPrefixer = function (AWS) {
                     }
 
                     if(head_data && head_data.ETag === '"' + hash + '"') {
-                        
+
                         //  AWS ETag doesn't match local ETag
                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
                         callback(null);
@@ -177,7 +170,7 @@ gulpPrefixer = function (AWS) {
                                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
                                     }
                                 } else {
-                                    // doesn't exist in bucket, the object is new to the bucket
+                                    // Doesn't exist in bucket; the object is new to the bucket
                                     gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
                                 }
 
@@ -200,7 +193,7 @@ gulpPrefixer = function (AWS) {
 module.exports = function(config) {
     var aws_config = config || {};
 
-    // Maintain backwards compatibility with legacy key and secret options
+    //  Maintain backwards compatibility with legacy key and secret options
     if(config.key) {
         aws_config.accessKeyId = config.key;
     }
@@ -209,14 +202,15 @@ module.exports = function(config) {
         aws_config.secretAccessKey = config.secret;
     }
 
-    // Intentionally not mandating the accessKeyId and secretAccessKey as they
-    // will be loaded automatically by the SDK from either environment variables
-    // or the credentials file.
-    // http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
+    //  Intentionally not mandating the accessKeyId and secretAccessKey as they
+    //  will be loaded automatically by the SDK from either environment variables
+    //  or the credentials file.
+    //  http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
 
     // Configure the proxy if an environment variable is present.
+
     if(process.env.HTTPS_PROXY) {
-        gutil.log("setting https proxy to %s", process.env.HTTPS_PROXY);
+        gutil.log("Setting https proxy to %s", process.env.HTTPS_PROXY);
 
         if(!aws_config.httpOptions) {
             aws_config.httpOptions = {};
@@ -227,7 +221,8 @@ module.exports = function(config) {
         aws_config.httpOptions.agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
     }
 
-    // Update the global AWS config if we have any overrides
+    //  Update the global AWS config if we have any overrides
+
     if(Object.keys(aws_config).length) {
         AWS.config.update(aws_config);
     }
