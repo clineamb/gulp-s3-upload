@@ -34,12 +34,9 @@ gulpPrefixer = function (AWS) {
 
         stream = es.map(function (file, callback) {
 
-            var _stream = this,
-                keyTransform, keyname, keyparts, filename,
+            var keyTransform, keyname, keyparts, filename,
                 mimetype, mime_lookup_name, metadata
             ;
-
-            file_counts.total++;
 
             if(file.isNull()) {
                 //  Do nothing if no contents
@@ -47,7 +44,7 @@ gulpPrefixer = function (AWS) {
             }
 
             if(file.isStream()) {
-                //  Not supporting streams (for now?).
+                //  Not supporting streams.
                 return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
             }
 
@@ -64,12 +61,16 @@ gulpPrefixer = function (AWS) {
 
             if(keyTransform) {
 
-                // Allow the transform function to take the complete path
-                // in case the user wants to change the path of the file, too.
+                //  Allow the transform function to take the
+                //  complete path in case the user wants to change
+                //  the path of the file, too.
+
                 keyname = keyTransform(file.relative);
 
             } else {
-                // otherwise keep it exactly parallel
+
+                // ...Otherwise keep it exactly parallel.
+
                 keyparts = helper.parsePath(file.relative);
                 keyname  = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
             }
@@ -91,6 +92,7 @@ gulpPrefixer = function (AWS) {
             // === Charset ==========================================
             // JIC text files get garbled. Appends to mimetype.
             // `charset` field gets filtered out later.
+
             if (options.charset && mimetype == 'text/html') {
                 mimetype += ';charset=' + options.charset;
             }
@@ -107,17 +109,19 @@ gulpPrefixer = function (AWS) {
                 }
             }
 
-            //  ETag Hash Comparison ================================
+            //  === ETag Hash Comparison =============================
             //  *NEW* in 1.1.0; do a local hash comparison to reduce
             //  the overhead from calling upload anyway.
             //  Add the option for a different algorithm, JIC for 
             //  some reason the algorithm is not MD5.
-            //  Available algorithms are those available w/
-            //  default node `crypto` plugin. (run `crypto.getCiphers()`)
+            //  Available algorithms are those available w/ default
+            //  node `crypto` plugin. (run `crypto.getCiphers()`)
 
             if(!options.etag_hash) {
+
                 //  If not defined, default to md5
                 options.etag_hash = 'md5';
+
             }
 
             hasha.fromFile(path.join(file.base, file.relative),
@@ -132,21 +136,22 @@ gulpPrefixer = function (AWS) {
                 _s3.headObject({
                     'Bucket': the_bucket,
                     'Key': keyname
-                }, function (getErr, getData) {
+                }, function (head_err, head_data) {
 
                     var objOpts;
 
-                    if(getErr && getErr.statusCode !== 404) {
-                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + getErr.stack));
+                    if(head_err && head_err.statusCode !== 404) {
+                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
                     }
 
-                    if(getData && getData.ETag === '"' + hash + '"') {
+                    if(head_data && head_data.ETag === '"' + hash + '"') {
+                        
                         //  AWS ETag doesn't match local ETag
-                        file_counts.unchanged++;
                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
                         callback(null);
 
                     } else {
+
                         objOpts = helper.filterOptions(options);
 
                         objOpts.Bucket      = the_bucket;
@@ -155,7 +160,7 @@ gulpPrefixer = function (AWS) {
                         objOpts.ContentType = mimetype;
                         objOpts.Metadata    = metadata;
 
-                        if (options.uploadNewFilesOnly && !getData || !options.uploadNewFilesOnly) {
+                        if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
                             gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
@@ -165,18 +170,15 @@ gulpPrefixer = function (AWS) {
                                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
                                 }
 
-                                if (getData) {
-                                    if (getData.ETag !== data.ETag) {
+                                if (head_data) {
+                                    if (head_data.ETag !== data.ETag) {
                                         gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
-                                        file_counts.updated++;
                                     } else {
                                         gutil.log(gutil.colors.gray("No Change ..... "), keyname);
-                                        file_counts.unchanged++;
                                     }
                                 } else {
                                     // doesn't exist in bucket, the object is new to the bucket
                                     gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
-                                    file_counts.new++;
                                 }
 
                                 callback(null);
@@ -195,7 +197,7 @@ gulpPrefixer = function (AWS) {
 // `config` now takes the paramters from the AWS-SDK constructor:
 // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
 
-module.exports = function (config) {
+module.exports = function(config) {
     var aws_config = config || {};
 
     // Maintain backwards compatibility with legacy key and secret options
