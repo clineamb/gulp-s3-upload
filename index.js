@@ -30,7 +30,7 @@ gulpPrefixer = function (AWS) {
         stream = es.map(function (file, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name, metadata
+                mimetype, mime_lookup_name, metadata, contentEncoding
             ;
 
             if(file.isNull()) {
@@ -70,7 +70,7 @@ gulpPrefixer = function (AWS) {
                 keyname  = helper.buildName(keyparts.dirname, keyparts.basename + keyparts.extname);
             }
 
-            
+
             keyname = keyname.replace(/\\/g, "/"); // JIC Windows (uses backslashes)
 
 
@@ -97,7 +97,7 @@ gulpPrefixer = function (AWS) {
             //  ONLY if `options.Metadata` is undefined.
 
             if (!options.Metadata && options.metadataMap) {
-                if (helper.isMetadataMapFn(options.metadataMap)) {
+                if (helper.isFunction(options.metadataMap)) {
                     metadata = options.metadataMap(keyname);
                 } else {
                     metadata = options.metadataMap;
@@ -107,7 +107,7 @@ gulpPrefixer = function (AWS) {
             //  === ETag Hash Comparison =============================
             //  *NEW* in 1.1; do a local hash comparison to reduce
             //  the overhead from calling upload anyway.
-            //  Add the option for a different algorithm, JIC for 
+            //  Add the option for a different algorithm, JIC for
             //  some reason the algorithm is not MD5.
             //  Available algorithms are those available w/ default
             //  node `crypto` plugin. (run `crypto.getCiphers()`)
@@ -115,6 +115,16 @@ gulpPrefixer = function (AWS) {
             if(!options.etag_hash) {
                 //  If not defined, default to md5
                 options.etag_hash = 'md5';
+            }
+
+            // == Add manual content encoding
+            //
+            if (!options.ContentEncoding && options.manualContentEncoding) {
+                if(helper.isFunction(options.manualContentEncoding)) {
+                    contentEncoding = options.manualContentEncoding(keyname);
+                } else {
+                    contentEncoding = options.manualContentEncoding;
+                }
             }
 
             hasha.fromFile(path.join(file.base, file.relative),
@@ -147,11 +157,12 @@ gulpPrefixer = function (AWS) {
 
                         objOpts = helper.filterOptions(options);
 
-                        objOpts.Bucket      = the_bucket;
-                        objOpts.Key         = keyname;
-                        objOpts.Body        = file.contents;
-                        objOpts.ContentType = mimetype;
-                        objOpts.Metadata    = metadata;
+                        objOpts.Bucket          = the_bucket;
+                        objOpts.Key             = keyname;
+                        objOpts.Body            = file.contents;
+                        objOpts.ContentType     = mimetype;
+                        objOpts.Metadata        = metadata;
+                        objOpts.ContentEncoding = contentEncoding;
 
                         if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
