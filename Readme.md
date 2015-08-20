@@ -1,7 +1,7 @@
 # gulp-s3-upload
 __Version 1.1.2__
 
-Use for uploading assets to Amazon S3 servers.  
+Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
 
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
@@ -78,20 +78,20 @@ Type: `string`
 
 Use this to add a charset to the mimetype. `"charset=[CHARSET]"` gets appended to the mimetype if this is defined.
 
-### etag_hash 
+### etag_hash
 
 Type: `string`
 
 Default: `'md5'`
 
-Use this to change the hashing of the files' ETags. The default is MD5.  More information on AWS's [Common Response Headers can be found here](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html).  You shouldn't have to change this, but AWS says the "ETag may or may not be an MD5 diest of the object data", so this option has been implemented should any other case arise. 
+Use this to change the hashing of the files' ETags. The default is MD5.  More information on AWS's [Common Response Headers can be found here](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTCommonResponseHeaders.html).  You shouldn't have to change this, but AWS says the "ETag may or may not be an MD5 diest of the object data", so this option has been implemented should any other case arise.
 
 
 #### keyTransform (nameTransform)
 
 Type: `function`
 
-Use this to transform your file names before they're uploaded to your S3 bucket.  
+Use this to transform your file names before they're uploaded to your S3 bucket.
 (Previously known as `name_transform`).
 
 ```js
@@ -207,6 +207,44 @@ Set `uploadNewFilesOnly: true` if you only want to upload new files and not
 overwrite existing ones.
 
 
+#### manualContentEncoding
+
+Type: `string` or `function`
+
+If you want to add a custom content-encoding header on a per file basis, you can
+define a function that determines the content encoding based on the keyname.
+Defining a `string` is like passing the `s3.putObject` param option `ContentEncoding`.
+
+Example (passing a `string`):
+```js
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            manualContentEncoding: 'gzip'
+        }));
+    });
+```
+
+Example (passing a `function`):
+```js
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            manualContentEncoding: function(keyname) {
+                var contentEncoding = null;
+
+                if (keyname.indexOf('.gz') !== -1) {
+                  contentEncoding = 'gzip';
+                }
+                return contentEncoding;
+            }
+        }));
+    });
+```
 
 ## AWS-SDK References
 
