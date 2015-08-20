@@ -15,7 +15,9 @@
     "s3",
     "aws",
     "upload",
-    "asynchronous"
+    "asynchronous",
+    "gulpplugin",
+    "gulpfriendly"
   ],
   "author": "Caroline Amaba <her@carolineamaba.com>",
   "license": "ISC",
