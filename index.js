@@ -104,6 +104,20 @@ gulpPrefixer = function (AWS) {
                 }
             }
 
+            //  === manualContentEncoding ===========================
+            //  Similar to metadataMap to put global / individual
+            //  headers on each file object (only if 
+            //  options.ContentEncoding) is undefined. (1.2)
+
+            if (!options.ContentEncoding && options.manualContentEncoding) {
+                if(helper.isFunction(options.manualContentEncoding)) {
+                    contentEncoding = options.manualContentEncoding(keyname);
+                } else {
+                    contentEncoding = options.manualContentEncoding;
+                }
+            }
+
+
             //  === ETag Hash Comparison =============================
             //  *NEW* in 1.1; do a local hash comparison to reduce
             //  the overhead from calling upload anyway.
@@ -115,16 +129,6 @@ gulpPrefixer = function (AWS) {
             if(!options.etag_hash) {
                 //  If not defined, default to md5
                 options.etag_hash = 'md5';
-            }
-
-            // == Add manual content encoding
-            //
-            if (!options.ContentEncoding && options.manualContentEncoding) {
-                if(helper.isFunction(options.manualContentEncoding)) {
-                    contentEncoding = options.manualContentEncoding(keyname);
-                } else {
-                    contentEncoding = options.manualContentEncoding;
-                }
             }
 
             hasha.fromFile(path.join(file.base, file.relative),
