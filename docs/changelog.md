@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.2.0
+
+* Added `manualContentEncoding` option from [pull request #22](https://github.com/clineamb/gulp-s3-upload/pull/22)
+
 
 ## Version 1.1.2
 

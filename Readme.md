@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.1.2__
+__Version 1.2.0__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -7,10 +7,6 @@ This helps to make it an easy gulp task.
 This package uses the [aws-sdk (node)](http://aws.amazon.com/sdk-for-node-js/).
 
 [NPM](https://www.npmjs.com/package/gulp-s3-upload) / [Changelog](docs/changelog.md)
-
-### What's New in 1.1
-*  File uploading is now Asynchronus!
-*  Reduced overhead in checking if a file is new.
 
 __See full details in the [Changelog](docs/changelog.md).__
 
