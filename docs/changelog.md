@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.3.1
+
+* Fix Metadata/ContentEncoding overwrite.
+
+
 ## Version 1.3.0
 
 * **NEW** -- Added `maps.ParamName` options!  You can now map each parameter offered by the `S3.putObject` function. More in the [Readme](readme.md).

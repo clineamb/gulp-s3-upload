@@ -30,8 +30,8 @@ gulpPrefixer = function (AWS) {
         stream = es.map(function (file, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name, metadata, content_encoding,
-                mapped_params
+                mimetype, mime_lookup_name,
+                metadata = null, content_encoding = null
             ;
 
             if(file.isNull()) {
@@ -100,8 +100,8 @@ gulpPrefixer = function (AWS) {
 
             if (_.isFunction(options.metadataMap)) {
                 metadata = options.metadataMap(keyname);
-            } else {
-                metadata = options.metadataMap;
+            } else if(_.isObject(options.metadataMap)) {
+                options.Metadata = options.metadataMap;
             }
 
             //  === manualContentEncoding ===========================
@@ -112,8 +112,8 @@ gulpPrefixer = function (AWS) {
 
             if(_.isFunction(options.manualContentEncoding)) {
                 content_encoding = options.manualContentEncoding(keyname);
-            } else {
-                content_encoding = options.manualContentEncoding;
+            } else if(_.isString(options.manualContentEncoding)) {
+                options.ContentEncoding = options.manualContentEncoding;
             }
 
             //  === maps.ParamNames =================================
@@ -183,11 +183,13 @@ gulpPrefixer = function (AWS) {
                         objOpts.Body            = file.contents;
                         objOpts.ContentType     = mimetype;
 
-                        if(!_.isUndefined(metadata)) {
+                        if(!_.isNull(metadata)) {
+                            // existing objOpts.Metadata gets overwrriten
                             objOpts.Metadata        = metadata;
                         }
 
-                        if(!_.isUndefined(metadata)) {
+                        if(!_.isNull(metadata)) {
+                            // existing objOpts.ContentEncoding gets overwrriten
                             objOpts.ContentEncoding = content_encoding;
                         }
 
