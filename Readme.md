@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.2.0__
+__Version 1.3.0__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -311,7 +311,7 @@ Example (passing a `function`):
 
 ## License
 
-Copyright (c) 2014, [Caroline Amaba](mailto:caroline.amaba@gmail.com)
+Copyright (c) 2015, [Caroline Amaba](mailto:github@carolineamaba.com)
 
 Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
 

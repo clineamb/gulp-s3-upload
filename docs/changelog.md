@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.3.0
+
+* **NEW** -- Added `maps.ParamName` options!  You can now map each parameter offered by the `S3.putObject` function. More in the [Readme](readme.md).
+* Fixed [issue #23](https://github.com/clineamb/gulp-s3-upload/issues/23) on existing mapping functions (`metadataMap`, `manualContentEncoding`).
+* Updated Readme.
+
+
 ## Version 1.2.0
 
 * Added `manualContentEncoding` option from [pull request #22](https://github.com/clineamb/gulp-s3-upload/pull/22)

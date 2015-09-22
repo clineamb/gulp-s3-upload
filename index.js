@@ -132,19 +132,15 @@ gulpPrefixer = function (AWS) {
             //  returns the appropriate type for that give putObject Param
             //  { Bucket: ... maps: { 'CacheControl': function()..., 'Expires': function()... }, etc. }
             //  See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
-            //  *** NEW in 1.2 ***
+            //  *** NEW in 1.3 ***
 
             if(!_.isUndefined(options.maps)) {
 
                 _.each(options.maps, function(mapRoutine, ParamName) {
-                    console.log(mapRoutine, ParamName);
-
                     if(_.isFunction(mapRoutine)) {
                         options[ParamName] = mapRoutine(keyname);
                     }
                 });
-
-                console.log(options);
             }
 
             //  === ETag Hash Comparison =============================
