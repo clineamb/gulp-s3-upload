@@ -98,14 +98,10 @@ gulpPrefixer = function (AWS) {
             //  ONLY if `options.Metadata` is undefined.
             //  ** WILL DEPRICATE IN 2.0.0 **
 
-            if (_.isUndefined(options.Metadata) && options.metadataMap) {
-                if (_.isFunction(options.metadataMap)) {
-                    metadata = options.metadataMap(keyname);
-                } else {
-                    metadata = options.metadataMap;
-                }
-            } else if(_.isObject(options.Metadata)) {
-                metadata = options.Metadata;
+            if (_.isFunction(options.metadataMap)) {
+                metadata = options.metadataMap(keyname);
+            } else {
+                metadata = options.metadataMap;
             }
 
             //  === manualContentEncoding ===========================
@@ -114,14 +110,10 @@ gulpPrefixer = function (AWS) {
             //  options.ContentEncoding) is undefined. (1.2)
             //  ** WILL DEPRICATE IN 2.0.0 **
 
-            if (_.isUndefined(options.ContentEncoding) && options.manualContentEncoding) {
-                if(_.isFunction(options.manualContentEncoding)) {
-                    content_encoding = options.manualContentEncoding(keyname);
-                } else {
-                    content_encoding = options.manualContentEncoding;
-                }
-            } else if(_.isString(options.ContentEncoding)) {
-                content_encoding = options.ContentEncoding;
+            if(_.isFunction(options.manualContentEncoding)) {
+                content_encoding = options.manualContentEncoding(keyname);
+            } else {
+                content_encoding = options.manualContentEncoding;
             }
 
             //  === maps.ParamNames =================================
@@ -190,8 +182,14 @@ gulpPrefixer = function (AWS) {
                         objOpts.Key             = keyname;
                         objOpts.Body            = file.contents;
                         objOpts.ContentType     = mimetype;
-                        objOpts.Metadata        = metadata;
-                        objOpts.ContentEncoding = content_encoding;
+
+                        if(!_.isUndefined(metadata)) {
+                            objOpts.Metadata        = metadata;
+                        }
+
+                        if(!_.isUndefined(metadata)) {
+                            objOpts.ContentEncoding = content_encoding;
+                        }
 
                         if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
