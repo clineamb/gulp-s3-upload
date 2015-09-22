@@ -106,8 +106,64 @@ Use this to transform your file names before they're uploaded to your S3 bucket.
     });
 ```
 
+#### maps.ParamName {}
+
+Type: `object` + `function`
+
+**NEW IN 1.2**
+
+Upon reviewing an issue with `metadataMap` and `manualContentEncoding`, a standard method for mapping each `s3.putObject` param was created. For now, `metadataMap` and `manualContentEncoding` are still available, but they will be depricated in the next major version (2.0).
+
+Each property of the maps option must be a function and must match the paramter being mapped. The files' `keyname` will be passed through (keep in mind, this is after any `keyTransform` calls).  The function should return the output S3 expects. [You can find more information and the available options here](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property).
+
+For example, to define metadataMap and separate expirations in this way:
+
+```js
+    var metadata_collection = { /* your info here */ };
+    var expirations = { /* your info here */ };
+
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            maps: {
+                Metadata: function(keyname) {
+                    path.basename(keyname); // just get the filename
+                    return metadata_collection[keyname]; // return an object
+                },
+                Expires: function(keyname) {
+                     path.basename(keyname); // just get the filename
+                     return new Date(expirations[keyname]);
+                }
+            }
+        }));
+    });
+```
+
+If anything but a function is passed through, nothing will happen. If you want to send a consistent value to all of your files this way, just simply set the option straight in the main options like so:
+
+```js
+    var expires = new Date();
+    expires.setUTCFullYear(2020);
+
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            Metadata: {
+                "example1": "This is an example"
+            },
+            Expires: expires
+        }));
+    });
+```
+
 
 #### metadataMap
+
+**NOTE**: It is preferred you use the maps.ParamsName method to define and map specific metadata to files.  Also, if you set both `maps.Metadata` and this, `metadataMap` will take precedence. 
 
 Type: `object` or `function`
 
@@ -204,6 +260,8 @@ overwrite existing ones.
 
 
 #### manualContentEncoding
+
+**NOTE**: It is preferred you use the maps.ParamsName method to define and map specific Content Encoding values to files.  If you set both `maps.ContentEncoding` and `manualContentEncoding`, `manualContentEncoding` will take priority.
 
 Type: `string` or `function`
 

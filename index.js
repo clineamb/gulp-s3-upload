@@ -30,7 +30,8 @@ gulpPrefixer = function (AWS) {
         stream = es.map(function (file, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name, metadata, contentEncoding
+                mimetype, mime_lookup_name, metadata, content_encoding,
+                mapped_params
             ;
 
             if(file.isNull()) {
@@ -95,28 +96,56 @@ gulpPrefixer = function (AWS) {
             //  === metadataMap =====================================
             //  Map files (using the keyname) to a metadata object.
             //  ONLY if `options.Metadata` is undefined.
+            //  ** WILL DEPRICATE IN 2.0.0 **
 
-            if (!options.Metadata && options.metadataMap) {
-                if (helper.isFunction(options.metadataMap)) {
+            if (_.isUndefined(options.Metadata) && options.metadataMap) {
+                if (_.isFunction(options.metadataMap)) {
                     metadata = options.metadataMap(keyname);
                 } else {
                     metadata = options.metadataMap;
                 }
+            } else if(_.isObject(options.Metadata)) {
+                metadata = options.Metadata;
             }
 
             //  === manualContentEncoding ===========================
             //  Similar to metadataMap to put global / individual
             //  headers on each file object (only if 
             //  options.ContentEncoding) is undefined. (1.2)
+            //  ** WILL DEPRICATE IN 2.0.0 **
 
-            if (!options.ContentEncoding && options.manualContentEncoding) {
-                if(helper.isFunction(options.manualContentEncoding)) {
-                    contentEncoding = options.manualContentEncoding(keyname);
+            if (_.isUndefined(options.ContentEncoding) && options.manualContentEncoding) {
+                if(_.isFunction(options.manualContentEncoding)) {
+                    content_encoding = options.manualContentEncoding(keyname);
                 } else {
-                    contentEncoding = options.manualContentEncoding;
+                    content_encoding = options.manualContentEncoding;
                 }
+            } else if(_.isString(options.ContentEncoding)) {
+                content_encoding = options.ContentEncoding;
             }
 
+            //  === maps.ParamNames =================================
+            //  This is a new mapper object that, if given in the
+            //  options as `maps.ParamName`, and is a function, will
+            //  run the given function and map that param data, given
+            //  that the return value of the `maps.ParamName` function
+            //  returns the appropriate type for that give putObject Param
+            //  { Bucket: ... maps: { 'CacheControl': function()..., 'Expires': function()... }, etc. }
+            //  See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
+            //  *** NEW in 1.2 ***
+
+            if(!_.isUndefined(options.maps)) {
+
+                _.each(options.maps, function(mapRoutine, ParamName) {
+                    console.log(mapRoutine, ParamName);
+
+                    if(_.isFunction(mapRoutine)) {
+                        options[ParamName] = mapRoutine(keyname);
+                    }
+                });
+
+                console.log(options);
+            }
 
             //  === ETag Hash Comparison =============================
             //  *NEW* in 1.1; do a local hash comparison to reduce
@@ -166,7 +195,7 @@ gulpPrefixer = function (AWS) {
                         objOpts.Body            = file.contents;
                         objOpts.ContentType     = mimetype;
                         objOpts.Metadata        = metadata;
-                        objOpts.ContentEncoding = contentEncoding;
+                        objOpts.ContentEncoding = content_encoding;
 
                         if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 

@@ -5,15 +5,6 @@ var Path    = require('path')
 ;
 
 module.exports = {
-    parsePath: function (path) {
-        var extname = Path.extname(path);
-
-        return {
-            'dirname':  Path.dirname(path),
-            'basename': Path.basename(path, extname),
-            'extname':  extname
-        };
-    },
 
     buildName: function (dirs, filename) {
         return Path.join(dirs, filename);
@@ -30,6 +21,7 @@ module.exports = {
             'keyTransform',
             'metadataMap',
             'manualContentEncoding',
+            'maps',
             'mimeTypeLookup',
             'nameTransform',
             'uploadNewFilesOnly',
@@ -39,7 +31,13 @@ module.exports = {
         return _.omit(params, omit_array);
     },
 
-    isFunction: function (fn) {
-        return _.isFunction(fn);
-    }
+    parsePath: function (path) {
+        var extname = Path.extname(path);
+
+        return {
+            'dirname':  Path.dirname(path),
+            'basename': Path.basename(path, extname),
+            'extname':  extname
+        };
+    },
 };
