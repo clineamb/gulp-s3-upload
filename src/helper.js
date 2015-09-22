@@ -29,6 +29,7 @@ module.exports = {
             'Key',
             'keyTransform',
             'metadataMap',
+            'manualContentEncoding',
             'mimeTypeLookup',
             'nameTransform',
             'uploadNewFilesOnly',
@@ -38,7 +39,7 @@ module.exports = {
         return _.omit(params, omit_array);
     },
 
-    isMetadataMapFn: function (metadataMap) {
-        return _.isFunction(metadataMap);
+    isFunction: function (fn) {
+        return _.isFunction(fn);
     }
 };
