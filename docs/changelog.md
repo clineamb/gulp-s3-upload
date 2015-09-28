@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.4.0
+
+* Add second paramter to task to take in [S3 Constructor options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor-property).
+
+
 ## Version 1.3.1
 
 * Fix Metadata/ContentEncoding overwrite.

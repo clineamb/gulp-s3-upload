@@ -14,12 +14,14 @@ const PLUGIN_NAME = 'gulp-s3-upload';
 
 gulpPrefixer = function (AWS) {
 
-    return function (options) {
+    return function (options, s3conf) {
 
         var stream
-        ,   _s3         = new AWS.S3()
+        ,   _s3         = new AWS.S3(s3conf || {})
         ,   the_bucket  = options.Bucket || options.bucket
         ;
+
+        console.log(_s3);
 
         if(!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
@@ -181,11 +183,15 @@ gulpPrefixer = function (AWS) {
                         objOpts.Bucket          = the_bucket;
                         objOpts.Key             = keyname;
                         objOpts.Body            = file.contents;
-                        objOpts.ContentType     = mimetype;
+                        
+                        if(mimetype.length) {
+                            //  A check in case of map ContentType
+                            objOpts.ContentType     = mimetype;
+                        }
 
                         if(!_.isNull(metadata)) {
                             // existing objOpts.Metadata gets overwrriten
-                            objOpts.Metadata        = metadata;
+                            objOpts.Metadata = metadata;
                         }
 
                         if(!_.isNull(metadata)) {
@@ -198,6 +204,8 @@ gulpPrefixer = function (AWS) {
                             gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
                             _s3.putObject(objOpts, function (err, data) {
+
+                                console.log(err, data);
 
                                 if (err) {
                                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
@@ -230,8 +238,8 @@ gulpPrefixer = function (AWS) {
 // `config` now takes the paramters from the AWS-SDK constructor:
 // http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property
 
-module.exports = function(config) {
-    var aws_config = config || {};
+module.exports = function(config, s3_config) {
+    var aws_config = {};
 
     //  Maintain backwards compatibility with legacy key and secret options
     if(config.key) {
@@ -263,11 +271,7 @@ module.exports = function(config) {
 
     //  Update the global AWS config if we have any overrides
 
-    if(Object.keys(aws_config).length) {
-        AWS.config.update(aws_config);
-    }
+    AWS.config.update(_.extend(config, aws_config));
 
-    AWS.config.update(aws_config);
-
-    return gulpPrefixer(AWS);
+    return gulpPrefixer(AWS, s3_config);
 };

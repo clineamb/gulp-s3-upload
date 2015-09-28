@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.3.1__
+__Version 1.4.0__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -40,6 +40,8 @@ Having AWS Key/Secrets may not be required by your AWS/IAM settings.  Errors thr
 
 ### Gulp Task
 
+**NEW 1.4.0**: The s3 plugin now takes a second object parameter that exposes the [options hash for the AWS S3 Constructor Property](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor-property).  Please note, if you have different configurations for different upload sets, you'll need to make a different task for each set.  You won't need the `accessKeyId` and secret since the plugin initially takes those in for the AWS Constructor.
+
 Create a task.
 
 ```js
@@ -48,6 +50,9 @@ gulp.task("upload", function() {
         .pipe(s3({
             Bucket: 'your-bucket-name', //  Required
             ACL:    'public-read'       //  Needs to be user-defined
+        }, {
+            // S3 Construcor Options, ie:
+            maxRetries: 5
         }))
     ;
 });
