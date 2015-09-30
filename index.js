@@ -21,8 +21,6 @@ gulpPrefixer = function (AWS) {
         ,   the_bucket  = options.Bucket || options.bucket
         ;
 
-        console.log(_s3);
-
         if(!the_bucket) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }

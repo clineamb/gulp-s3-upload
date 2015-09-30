@@ -1,9 +1,9 @@
 # Changelog
 
-## Version 1.4.0
+## Version 1.4.0, 1.4.1
 
 * Add second paramter to task to take in [S3 Constructor options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor-property).
-
+* 1.4.1: Quickly remove a hanging `console.log` from development.
 
 ## Version 1.3.1
 
