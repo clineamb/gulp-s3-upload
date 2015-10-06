@@ -30,7 +30,7 @@ gulpPrefixer = function (AWS) {
         stream = es.map(function (file, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name,
+                mimetype, mime_lookup_name, hash
                 metadata = null, content_encoding = null
             ;
 
@@ -148,83 +148,75 @@ gulpPrefixer = function (AWS) {
                 options.etag_hash = 'md5';
             }
 
-            hasha.fromFile(path.join(file.base, file.relative),
-                {'algorithm': options.etag_hash}, function (hasha_err, hash) {
+            hash = hasha(file._contents, {'algorithm': options.etag_hash});
 
-                if(hasha_err) {
-                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 hasha Error: " + err.stack));
+            //  *Note: `options.Metadata` is not filtered out later.
+
+            _s3.headObject({
+                'Bucket': the_bucket,
+                'Key': keyname
+            }, function (head_err, head_data) {
+
+                var objOpts;
+
+                if(head_err && head_err.statusCode !== 404) {
+                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
                 }
 
-                //  *Note: `options.Metadata` is not filtered out later.
+                if(head_data && head_data.ETag === '"' + hash + '"') {
 
-                _s3.headObject({
-                    'Bucket': the_bucket,
-                    'Key': keyname
-                }, function (head_err, head_data) {
+                    //  AWS ETag doesn't match local ETag
+                    gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                    callback(null);
 
-                    var objOpts;
+                } else {
 
-                    if(head_err && head_err.statusCode !== 404) {
-                        return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
+                    objOpts = helper.filterOptions(options);
+
+                    objOpts.Bucket          = the_bucket;
+                    objOpts.Key             = keyname;
+                    objOpts.Body            = file.contents;
+                    
+                    if(mimetype.length) {
+                        //  A check in case of map ContentType
+                        objOpts.ContentType     = mimetype;
                     }
 
-                    if(head_data && head_data.ETag === '"' + hash + '"') {
+                    if(!_.isNull(metadata)) {
+                        // existing objOpts.Metadata gets overwrriten
+                        objOpts.Metadata = metadata;
+                    }
 
-                        //  AWS ETag doesn't match local ETag
-                        gutil.log(gutil.colors.gray("No Change ..... "), keyname);
-                        callback(null);
+                    if(!_.isNull(metadata)) {
+                        // existing objOpts.ContentEncoding gets overwrriten
+                        objOpts.ContentEncoding = content_encoding;
+                    }
 
-                    } else {
+                    if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
-                        objOpts = helper.filterOptions(options);
+                        gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
-                        objOpts.Bucket          = the_bucket;
-                        objOpts.Key             = keyname;
-                        objOpts.Body            = file.contents;
-                        
-                        if(mimetype.length) {
-                            //  A check in case of map ContentType
-                            objOpts.ContentType     = mimetype;
-                        }
+                        _s3.putObject(objOpts, function (err, data) {
 
-                        if(!_.isNull(metadata)) {
-                            // existing objOpts.Metadata gets overwrriten
-                            objOpts.Metadata = metadata;
-                        }
+                            if (err) {
+                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
+                            }
 
-                        if(!_.isNull(metadata)) {
-                            // existing objOpts.ContentEncoding gets overwrriten
-                            objOpts.ContentEncoding = content_encoding;
-                        }
-
-                        if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
-
-                            gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
-
-                            _s3.putObject(objOpts, function (err, data) {
-
-                                console.log(err, data);
-
-                                if (err) {
-                                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
-                                }
-
-                                if (head_data) {
-                                    if (head_data.ETag !== data.ETag) {
-                                        gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
-                                    } else {
-                                        gutil.log(gutil.colors.gray("No Change ..... "), keyname);
-                                    }
+                            if (head_data) {
+                                if (head_data.ETag !== data.ETag) {
+                                    gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
                                 } else {
-                                    // Doesn't exist in bucket; the object is new to the bucket
-                                    gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                                    gutil.log(gutil.colors.gray("No Change ..... "), keyname);
                                 }
+                            } else {
+                                // Doesn't exist in bucket; the object is new to the bucket
+                                gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                            }
 
-                                callback(null);
-                            });
-                        }
+                            callback(null);
+                        });
                     }
-                });
+                }
             });
         });
 
