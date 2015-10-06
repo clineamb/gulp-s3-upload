@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.4.2
+
+* Update file-hashing function with [hasha](http://github.com/sindresorhus/hasha) from a signature change.  Simply pull file buffer instead of promise for simplicity sake.
+* Remove old `console.log` from local dev.
+
+
 ## Version 1.4.0, 1.4.1
 
 * Add second paramter to task to take in [S3 Constructor options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor-property).
