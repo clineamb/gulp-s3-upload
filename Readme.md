@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.4.2__
+__Version 1.4.3__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -23,9 +23,23 @@ __See full details in the [Changelog](docs/changelog.md).__
     var s3 = require('gulp-s3-upload')(config);
 ```
 
+...where config is something like...
+
+```js
+var config = {
+    accessKeyId: "YOURACCESSKEY",
+    accessKeySecret: "YOUACCESSSECRET"
+}
+
+//  ...or...
+
+var config = JSON.parse(fs.readFileSync('private/awsaccess.json'));
+
+```
+
 The optional `config` argument can include any option available (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property). By default all settings are undefined.
 
-Per AWS best practices, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp.
+**Per AWS best practices**, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp.
 
 ```sh
 AWS_PROFILE=myprofile gulp

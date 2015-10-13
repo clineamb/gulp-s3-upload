@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.4.3
+*  Fix issue [issue #26](http://github.com/clineamb/gulp-s3-upload/issues/23)
+  *  Move things into `s3.headObject` call to prevent mutable variable errors.
+*  Clean up some comments.
+*  Update Readme to clarify `config` hash in the config section.
+
+
 ## Version 1.4.2
 
 * Update file-hashing function with [hasha](http://github.com/sindresorhus/hasha) from a signature change.  Simply pull file buffer instead of promise for simplicity sake.
