@@ -25,7 +25,7 @@ gulpPrefixer = function (AWS) {
             throw new PluginError(PLUGIN_NAME, "Missing S3 bucket name!");
         }
 
-        //  *NEW* in v1.1.0 - Async File Uploading
+        //  Async File Uploading
 
         stream = es.map(function (file, callback) {
 
@@ -104,6 +104,8 @@ gulpPrefixer = function (AWS) {
                 options.Metadata = options.metadataMap;
             }
 
+            //  *Note: `options.Metadata` is not filtered out later.
+
             //  === manualContentEncoding ===========================
             //  Similar to metadataMap to put global / individual
             //  headers on each file object (only if 
@@ -116,48 +118,29 @@ gulpPrefixer = function (AWS) {
                 options.ContentEncoding = options.manualContentEncoding;
             }
 
-            //  === maps.ParamNames =================================
-            //  This is a new mapper object that, if given in the
-            //  options as `maps.ParamName`, and is a function, will
-            //  run the given function and map that param data, given
-            //  that the return value of the `maps.ParamName` function
-            //  returns the appropriate type for that give putObject Param
-            //  { Bucket: ... maps: { 'CacheControl': function()..., 'Expires': function()... }, etc. }
-            //  See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
-            //  *** NEW in 1.3 ***
-
-            if(!_.isUndefined(options.maps)) {
-
-                _.each(options.maps, function(mapRoutine, ParamName) {
-                    if(_.isFunction(mapRoutine)) {
-                        options[ParamName] = mapRoutine(keyname);
-                    }
-                });
-            }
-
-            //  === ETag Hash Comparison =============================
-            //  *NEW* in 1.1; do a local hash comparison to reduce
-            //  the overhead from calling upload anyway.
-            //  Add the option for a different algorithm, JIC for
-            //  some reason the algorithm is not MD5.
-            //  Available algorithms are those available w/ default
-            //  node `crypto` plugin. (run `crypto.getCiphers()`)
-
-            if(!options.etag_hash) {
-                //  If not defined, default to md5
-                options.etag_hash = 'md5';
-            }
-
-            hash = hasha(file._contents, {'algorithm': options.etag_hash});
-
-            //  *Note: `options.Metadata` is not filtered out later.
-
+            //  Check the file that's up in the bucket already 
+            
             _s3.headObject({
                 'Bucket': the_bucket,
                 'Key': keyname
             }, function (head_err, head_data) {
 
                 var objOpts;
+
+                //  === ETag Hash Comparison =============================
+                //  Do a local hash comparison to reduce
+                //  the overhead from calling upload anyway.
+                //  Add the option for a different algorithm, JIC for
+                //  some reason the algorithm is not MD5.
+                //  Available algorithms are those available w/ default
+                //  node `crypto` plugin. (run `crypto.getCiphers()`)
+
+                if(!options.etag_hash) {
+                    //  If not defined, default to md5
+                    options.etag_hash = 'md5';
+                }
+
+                hash = hasha(file._contents, {'algorithm': options.etag_hash});
 
                 if(head_err && head_err.statusCode !== 404) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
@@ -187,9 +170,28 @@ gulpPrefixer = function (AWS) {
                         objOpts.Metadata = metadata;
                     }
 
-                    if(!_.isNull(metadata)) {
+                    if(!_.isNull(content_encoding)) {
                         // existing objOpts.ContentEncoding gets overwrriten
                         objOpts.ContentEncoding = content_encoding;
+                    }
+
+                    //  === maps.ParamNames =================================
+                    //  This is a new mapper object that, if given in the
+                    //  options as `maps.ParamName`, and is a function, will
+                    //  run the given function and map that param data, given
+                    //  that the return value of the `maps.ParamName` function
+                    //  returns the appropriate type for that give putObject Param
+                    //  { Bucket: ... maps: { 'CacheControl': function()..., 'Expires': function()... }, etc. }
+                    //  See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
+                    //  This will end up overwriting old Metadata and ContentEncoding
+                    //  if they were included in maps hash.
+
+                    if(!_.isUndefined(options.maps)) {
+                        _.each(options.maps, function(mapRoutine, ParamName) {
+                            if(_.isFunction(mapRoutine)) {
+                                objOpts[ParamName] = mapRoutine(keyname);
+                            }
+                        });
                     }
 
                     if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
