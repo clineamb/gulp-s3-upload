@@ -35,6 +35,10 @@ var config = {
 
 var config = JSON.parse(fs.readFileSync('private/awsaccess.json'));
 
+//  ...or to use IAM settings...
+
+var config = {};
+
 ```
 
 The optional `config` argument can include any option available (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property). By default all settings are undefined.
