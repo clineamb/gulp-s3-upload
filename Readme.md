@@ -28,7 +28,7 @@ __See full details in the [Changelog](docs/changelog.md).__
 ```js
 var config = {
     accessKeyId: "YOURACCESSKEY",
-    accessKeySecret: "YOUACCESSSECRET"
+    secretAccessKey: "YOUACCESSSECRET"
 }
 
 //  ...or...
