@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.4.4
+* Fix parameter name in Readme.md [(issue #27)](http://github.com/clineamb/gulp-s3-upload/issues/27)
+* Add an option for config to take `{useIAM:true}` to be explicit
+* Upgrade packages (all patch versions)
+
+
 ## Version 1.4.3
 *  Fix issue [issue #26](http://github.com/clineamb/gulp-s3-upload/issues/23)
   *  Move things into `s3.headObject` call to prevent mutable variable errors.
