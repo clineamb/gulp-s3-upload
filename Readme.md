@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.4.3__
+__Version 1.4.4__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -38,6 +38,13 @@ var config = JSON.parse(fs.readFileSync('private/awsaccess.json'));
 //  ...or to use IAM settings...
 
 var config = { useIAM: true };
+
+// ...or to use IAM w/ S3 config settings ...
+
+var s3 = require('gulp-s3-upload')(
+    {useIAM:true},  // or {} / null
+    { /* S3 Config */ }
+);
 
 ```
 
