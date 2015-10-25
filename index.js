@@ -242,6 +242,12 @@ module.exports = function(config, s3_config) {
         aws_config.secretAccessKey = config.secret;
     }
 
+    //  If using IAM
+
+    if(_.has(config, 'useIAM') && config.useIAM) {
+        config = {};
+    }
+
     //  Intentionally not mandating the accessKeyId and secretAccessKey as they
     //  will be loaded automatically by the SDK from either environment variables
     //  or the credentials file.
@@ -263,7 +269,7 @@ module.exports = function(config, s3_config) {
 
     //  Update the global AWS config if we have any overrides
 
-    AWS.config.update(_.extend(config, aws_config));
+    AWS.config.update(_.extend({}, config, aws_config));
 
     return gulpPrefixer(AWS, s3_config);
 };
