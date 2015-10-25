@@ -233,6 +233,10 @@ gulpPrefixer = function (AWS) {
 module.exports = function(config, s3_config) {
     var aws_config = {};
 
+    if(_.isUndefined(config)) {
+        config = {};
+    }
+
     //  Maintain backwards compatibility with legacy key and secret options
     if(config.key) {
         aws_config.accessKeyId = config.key;
