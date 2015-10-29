@@ -142,6 +142,27 @@ Use this to transform your file names before they're uploaded to your S3 bucket.
 
 Type: `object` + `function`
 
+
+#### onChange
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file resulted in a change.
+
+
+#### onNoChange
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file did not result in a change.
+
+
+#### onNew
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file is a new file in the bucket.
+
 **NEW IN 1.3**
 
 Upon reviewing an issue with `metadataMap` and `manualContentEncoding`, a standard method for mapping each `s3.putObject` param was created. For now, `metadataMap` and `manualContentEncoding` are still available, but they will be depricated in the next major version (2.0).

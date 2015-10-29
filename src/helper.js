@@ -24,6 +24,9 @@ module.exports = {
             'maps',
             'mimeTypeLookup',
             'nameTransform',
+            'onChange',
+            'onNoChange',
+            'onNew',
             'uploadNewFilesOnly',
             'verbose'
         ];

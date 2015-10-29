@@ -108,7 +108,7 @@ gulpPrefixer = function (AWS) {
 
             //  === manualContentEncoding ===========================
             //  Similar to metadataMap to put global / individual
-            //  headers on each file object (only if 
+            //  headers on each file object (only if
             //  options.ContentEncoding) is undefined. (1.2)
             //  ** WILL DEPRICATE IN 2.0.0 **
 
@@ -118,8 +118,8 @@ gulpPrefixer = function (AWS) {
                 options.ContentEncoding = options.manualContentEncoding;
             }
 
-            //  Check the file that's up in the bucket already 
-            
+            //  Check the file that's up in the bucket already
+
             _s3.headObject({
                 'Bucket': the_bucket,
                 'Key': keyname
@@ -159,7 +159,7 @@ gulpPrefixer = function (AWS) {
                     objOpts.Bucket          = the_bucket;
                     objOpts.Key             = keyname;
                     objOpts.Body            = file.contents;
-                    
+
                     if(mimetype.length) {
                         //  A check in case of map ContentType
                         objOpts.ContentType     = mimetype;
@@ -207,12 +207,21 @@ gulpPrefixer = function (AWS) {
                             if (head_data) {
                                 if (head_data.ETag !== data.ETag) {
                                     gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
+                                    if (options.onChange && typeof options.onChange === 'function') {
+                                      options.onChange.call(this, keyname);
+                                    }
                                 } else {
                                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                                    if (options.onNoChange && typeof options.onNoChange === 'function') {
+                                      options.onNoChange.call(this, keyname);
+                                    }
                                 }
                             } else {
                                 // Doesn't exist in bucket; the object is new to the bucket
                                 gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                                if (options.onNew && typeof options.onNew === 'function') {
+                                  options.onNew.call(this, keyname);
+                                }
                             }
 
                             callback(null);
