@@ -142,29 +142,6 @@ Use this to transform your file names before they're uploaded to your S3 bucket.
 
 Type: `object` + `function`
 
-
-#### onChange
-
-Type: `function`
-
-This function gets called with the S3 keyname as the first parameter if the uploaded file resulted in a change.
-
-
-#### onNoChange
-
-Type: `function`
-
-This function gets called with the S3 keyname as the first parameter if the uploaded file did not result in a change.
-
-
-#### onNew
-
-Type: `function`
-
-This function gets called with the S3 keyname as the first parameter if the uploaded file is a new file in the bucket.
-
-**NEW IN 1.3**
-
 Upon reviewing an issue with `metadataMap` and `manualContentEncoding`, a standard method for mapping each `s3.putObject` param was created. For now, `metadataMap` and `manualContentEncoding` are still available, but they will be depricated in the next major version (2.0).
 
 Each property of the maps option must be a function and must match the paramter being mapped. The files' `keyname` will be passed through (keep in mind, this is after any `keyTransform` calls).  The function should return the output S3 expects. [You can find more information and the available options here](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property).
@@ -221,11 +198,13 @@ If anything but a function is passed through, nothing will happen. If you want t
 Type: `object` or `function`
 
 If you have constant metadata you want to attach to each object,
-just define the object, and it will be included to each object.
+just define the object, and it will be included to each file object being upload.
+
 If you wish to change it per object, you can pass a function through
 to modify the metadata based on the (transformed) keyname.
 
 Example (passing an `object`):
+
 ```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
@@ -239,11 +218,8 @@ Example (passing an `object`):
         }));
     });
 ```
-Passing the `s3.putObject` param option `Metadata` is effectively the same thing
-as passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not
-it will use the object passed to `Metadata` as metadata for all the files that
-will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` will take
-precedence and be added to each file being uploaded.
+
+Passing the `s3.putObject` param option `Metadata` is effectively the same thingas passing an `object` to `metadataMap`.  `Metadata` is defined and `metadataMap` is not it will use the object passed to `Metadata` as metadata for all the files that will be uploaded.  If both `Metadata` and `metadataMap` are defined, `Metadata` will take precedence and be added to each file being uploaded.
 
 Example (passing a `function`):
 
@@ -303,15 +279,6 @@ Use this to transform what the key that is used to match the MIME type when uplo
     });
 ```
 
-
-#### uploadNewFilesOnly
-
-Type: `boolean`
-
-Set `uploadNewFilesOnly: true` if you only want to upload new files and not
-overwrite existing ones.
-
-
 #### manualContentEncoding
 
 **NOTE**: It is preferred you use the maps.ParamsName method to define and map specific Content Encoding values to files.  If you set both `maps.ContentEncoding` and `manualContentEncoding`, `manualContentEncoding` will take priority.
@@ -323,6 +290,7 @@ define a function that determines the content encoding based on the keyname.
 Defining a `string` is like passing the `s3.putObject` param option `ContentEncoding`.
 
 Example (passing a `string`):
+
 ```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
@@ -335,6 +303,7 @@ Example (passing a `string`):
 ```
 
 Example (passing a `function`):
+
 ```js
     gulp.task("upload", function() {
         gulp.src("./dir/to/upload/**")
@@ -352,6 +321,53 @@ Example (passing a `function`):
         }));
     });
 ```
+
+#### Post-Upload Callbacks
+
+**New in 1.5** This feature by [benib](http://github.com/benib) was merged to the main plugin for version 1.5.0.  
+
+##### onChange
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file resulted in a change.  Note the keyname passed is after any `keyTransform` modifications.
+
+Example:
+```js
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**")
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read',
+            onChange: function(keyname) {
+                logChangedFiles(keyname);   // or whatever you want
+            }
+        }));
+    });
+```
+
+
+##### onNoChange
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file did not result in a change, much like `onChange`.
+
+
+##### onNew
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the uploaded file is a new file in the bucket, much like `onChange`.
+
+
+#### uploadNewFilesOnly
+
+Type: `boolean`
+
+Set `uploadNewFilesOnly: true` if you only want to upload new files and not
+overwrite existing ones.
+
 
 ## AWS-SDK References
 
