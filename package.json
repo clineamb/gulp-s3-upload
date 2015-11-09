@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/clineamb/gulp-s3-upload",
   "dependencies": {
-    "aws-sdk": "2.2.11",
+    "aws-sdk": "2.2.15",
     "event-stream": "^3.3.2",
     "gulp-util": "^3.0.7",
     "hasha": "^2.0.2",
