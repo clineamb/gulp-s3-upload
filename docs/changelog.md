@@ -1,7 +1,8 @@
 # Changelog
 
 ## Verision 1.5.0
-* Add post-upload callback options, by [benib](http://github.com/benib) in [pull request #30](http://github.com/clineamb/gulp-s3-upload/pull/30)
+* **NEW** -- Added post-upload callback options, by [benib](http://github.com/benib) in [pull request #30](http://github.com/clineamb/gulp-s3-upload/pull/30)
+* Upgrade `aws-sdk` node module (2.2.11 -> 2.2.15)
 
 
 ## Version 1.4.4
