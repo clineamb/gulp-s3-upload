@@ -1,5 +1,9 @@
 # Changelog
 
+## Verision 1.5.0
+* Add post-upload callback options, by [benib](http://github.com/benib) in [pull request #30](http://github.com/clineamb/gulp-s3-upload/pull/30)
+
+
 ## Version 1.4.4
 * Fix parameter name in Readme.md [(issue #27)](http://github.com/clineamb/gulp-s3-upload/issues/27)
 * Add an option for config to take `{useIAM:true}` to be explicit
