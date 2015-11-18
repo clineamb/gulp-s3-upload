@@ -150,6 +150,11 @@ gulpPrefixer = function (AWS) {
 
                     //  AWS ETag doesn't match local ETag
                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+
+                    if (options.onNoChange && typeof options.onNoChange === 'function') {
+                      options.onNoChange.call(this, keyname);
+                    }
+
                     callback(null);
 
                 } else {
