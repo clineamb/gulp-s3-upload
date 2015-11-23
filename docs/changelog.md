@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.5.1
+* Merge bug fix [pull request #31](https://github.com/clineamb/gulp-s3-upload/pull/31) to fix the hash-comparison (calling the `noChange` callback on upon equal hash comparison)
+* Update docs (typos, clairty)
+
+
 ## Version 1.5.0
 * **NEW** -- Added post-upload callback options, by [benib](http://github.com/benib) in [pull request #30](http://github.com/clineamb/gulp-s3-upload/pull/30)
 * Upgrade `aws-sdk` node module (2.2.11 -> 2.2.15)
