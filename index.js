@@ -212,18 +212,23 @@ gulpPrefixer = function (AWS) {
                             if (head_data) {
                                 if (head_data.ETag !== data.ETag) {
                                     gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
+
                                     if (options.onChange && typeof options.onChange === 'function') {
                                       options.onChange.call(this, keyname);
                                     }
+
                                 } else {
                                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+
                                     if (options.onNoChange && typeof options.onNoChange === 'function') {
                                       options.onNoChange.call(this, keyname);
                                     }
+                                    
                                 }
                             } else {
                                 // Doesn't exist in bucket; the object is new to the bucket
                                 gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+
                                 if (options.onNew && typeof options.onNew === 'function') {
                                   options.onNew.call(this, keyname);
                                 }
