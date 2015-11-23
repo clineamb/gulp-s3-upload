@@ -50,13 +50,16 @@ var s3 = require('gulp-s3-upload')(
 
 The optional `config` argument can include any option available (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property). By default all settings are undefined. 
 
-**Per AWS best practices**, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp.
+**Per AWS best practices**, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp:
 
-If you are using **IAM** settings, just pass the noted config above in order to default to using IAM.  More information on using [IAM settings here](https://aws.amazon.com/documentation/iam/). 
 
 ```sh
-AWS_PROFILE=myprofile gulp
+AWS_PROFILE=myprofile gulp upload
 ```
+
+If you are using **IAM** settings, just pass the noted config (`{useIAM:true}`) in order to default to using IAM.  More information on using [IAM settings here](https://aws.amazon.com/documentation/iam/). 
+
+
 
 You can also use a node_module like [config](https://www.npmjs.com/package/config) (+ [js-yaml](https://www.npmjs.com/package/js-yaml)) to load config files in your `gulpfile.js`.  You can also use `fs.readFileSync` to read from a local file to load your config.
 
