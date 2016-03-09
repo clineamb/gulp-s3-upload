@@ -50,8 +50,11 @@ var s3 = require('gulp-s3-upload')(
 
 The optional `config` argument can include any option available (like `region`) available in the [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property). By default all settings are undefined. 
 
-**Per AWS best practices**, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options. If you have multiple profiles configured in your AWS credentials file, you can specify the profile name inline with the call to gulp:
+**Per AWS best practices**, the recommended approach for loading credentials is to use the shared credentials file (`~/.aws/credentials`). You can also set the `aws_access_key_id` and `aws_secret_access_key` environment variables or specify values directly in the gulpfile via the `accessKeyId` and `secretAccessKey` options.  
 
+If you want to use an AWS profile in your `~/.aws/credentials` file just set
+the environment variable AWS_PROFILE with your profile name before invoking
+your gulp task:
 
 ```sh
 AWS_PROFILE=myprofile gulp upload
