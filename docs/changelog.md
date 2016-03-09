@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.5.2
+* Update modules
+    *  `aws-sdk` module (2.2.18 -> 2.2.42)
+    *  `hasha` module (2.0.2 -> 2.2.0)
+    
+
 ## Version 1.5.1
 * Merge bug fix [pull request #31](https://github.com/clineamb/gulp-s3-upload/pull/31) to fix the hash-comparison (calling the `noChange` callback on upon equal hash comparison)
 * Update docs (typos, clairty)
