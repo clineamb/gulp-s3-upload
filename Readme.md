@@ -374,6 +374,22 @@ Type: `boolean`
 Set `uploadNewFilesOnly: true` if you only want to upload new files and not
 overwrite existing ones.
 
+## Streams
+
+When uploading large files you may want to use `gulp.src` without buffers. Normally this plugin calculates an ETag hash of the contents and compares that to the existing files in the bucket. However, when using streams, we can't do this comparison.
+
+Furthermore, the AWS SDK requires us to have a `ContentLength` in bytes of contents uploaded as a stream. This means streams are currently only supported for gulp sources that indicate the file size in `file.stat.size`, which is automatic when using a file system source.
+
+Example:
+```js
+    gulp.task("upload", function() {
+        gulp.src("./dir/to/upload/**", {buffer:false}) // buffer:false for streams
+        .pipe(s3({
+            Bucket: 'example-bucket',
+            ACL: 'public-read'
+        }));
+    });
+```
 
 ## AWS-SDK References
 
