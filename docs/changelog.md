@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.6.0
+
+*  Stream support added thanks to [@algesten](https://github.com/algesten) - [PR #34](https://github.com/clineamb/gulp-s3-upload/pull/34)
+*  [aws-sdk](https://github.com/aws/aws-sdk-js) upgraded.
+
+
+
 ## Version 1.5.2
 * Update modules
     *  `aws-sdk` module (2.2.18 -> 2.2.42)

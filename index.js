@@ -30,7 +30,7 @@ gulpPrefixer = function (AWS) {
         stream = es.map(function (file, callback) {
 
             var keyTransform, keyname, keyparts, filename,
-                mimetype, mime_lookup_name, hash
+                mimetype, mime_lookup_name, hash, nohash
                 metadata = null, content_encoding = null
             ;
 
@@ -38,12 +38,6 @@ gulpPrefixer = function (AWS) {
                 //  Do nothing if no contents
                 return callback(null);
             }
-
-            if(file.isStream()) {
-                //  Not supporting streams.
-                return callback(new gutil.PluginError(PLUGIN_NAME, 'No stream support.'));
-            }
-
 
             //  =====================================================
             //  ============= METHOD TRANSFORMS & LOOKUPS ===========
@@ -127,6 +121,10 @@ gulpPrefixer = function (AWS) {
 
                 var objOpts;
 
+                if(head_err && head_err.statusCode !== 404) {
+                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
+                }
+
                 //  === ETag Hash Comparison =============================
                 //  Do a local hash comparison to reduce
                 //  the overhead from calling upload anyway.
@@ -140,13 +138,13 @@ gulpPrefixer = function (AWS) {
                     options.etag_hash = 'md5';
                 }
 
-                hash = hasha(file._contents, {'algorithm': options.etag_hash});
+                //  Hashing requires us to have the entire contents of
+                //  the file. This is not possible for streams.
+                nohash = file.isStream() || options.etag_hash == 'none';
 
-                if(head_err && head_err.statusCode !== 404) {
-                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
-                }
+                hash = nohash ? 'nohash' : hasha(file._contents, {'algorithm': options.etag_hash});
 
-                if(head_data && head_data.ETag === '"' + hash + '"') {
+                if(!nohash && head_data && head_data.ETag === '"' + hash + '"') {
 
                     //  AWS ETag doesn't match local ETag
                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
@@ -200,6 +198,17 @@ gulpPrefixer = function (AWS) {
                     }
 
                     if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
+
+                        //  When using streams, the ContentLength must be
+                        //  known to S3. This is only possible if the incoming
+                        //  vinyl file somehow carries the byte length.
+                        if (file.isStream()) {
+                            if (file.stat) {
+                                objOpts.ContentLength = file.stat.size;
+                            } else {
+                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Upload of streamObject must have a ContentLength"));
+                            }
+                        }
 
                         gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
