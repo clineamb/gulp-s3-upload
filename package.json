@@ -1,6 +1,6 @@
 {
   "name": "gulp-s3-upload",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "A gulp task to asynchronous upload/update assets to an AWS S3 Bucket.",
   "main": "index.js",
   "directories": {
@@ -17,7 +17,10 @@
     "upload",
     "asynchronous",
     "gulpplugin",
-    "gulpfriendly"
+    "gulpfriendly",
+    "streams",
+    "stream support",
+    "stream"
   ],
   "author": "Caroline Amaba <her@carolineamaba.com>",
   "license": "ISC",
