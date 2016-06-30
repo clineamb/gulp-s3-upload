@@ -121,7 +121,9 @@ gulpPrefixer = function (AWS) {
 
                 var objOpts;
 
-                if(head_err && head_err.statusCode !== 404) {
+                // If object doesn't exist then S3 returns 404 or 403 depending on whether you have s3:ListBucket permission.
+                // See http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html#rest-object-head-permissions
+                if(head_err && !(head_err.statusCode === 404 || head_err.statusCode === 403)) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
                 }
 
