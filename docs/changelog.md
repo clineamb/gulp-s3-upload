@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.6.1
+
+*  Error checking for ListBucket permissions check. [PR #39](https://github.com/clineamb/gulp-s3-upload/pull/39) by [@tobiasweibel](https://github.com/tobiasweibel)
+*  Upgrade npm packages. (`event-stream`)
+
+
 ## Version 1.6.0
 
 *  Stream support added thanks to [@algesten](https://github.com/algesten) - [PR #34](https://github.com/clineamb/gulp-s3-upload/pull/34)
