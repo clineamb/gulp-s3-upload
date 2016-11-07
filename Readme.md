@@ -84,7 +84,7 @@ gulp.task("upload", function() {
             Bucket: 'your-bucket-name', //  Required
             ACL:    'public-read'       //  Needs to be user-defined
         }, {
-            // S3 Construcor Options, ie:
+            // S3 Constructor Options, ie:
             maxRetries: 5
         }))
     ;
