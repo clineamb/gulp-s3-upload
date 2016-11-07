@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 1.6.2
+## Version 1.6.3
 
 *  Merge in spelling fix. [PR #41](https://github.com/clineamb/gulp-s3-upload/pull/41).
 *  Upgrade npm packages:
