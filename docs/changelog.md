@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.6.2
+
+*  Merge in spelling fix. [PR #41](https://github.com/clineamb/gulp-s3-upload/pull/41).
+*  Upgrade npm packages:
+  *  `event-stream` - `3.3.2  →  ^3.3.4`
+
 ## Version 1.6.1
 
 *  Error checking for ListBucket permissions check. [PR #39](https://github.com/clineamb/gulp-s3-upload/pull/39) by [@tobiasweibel](https://github.com/tobiasweibel)
