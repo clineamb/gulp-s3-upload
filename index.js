@@ -163,6 +163,8 @@ gulpPrefixer = function (AWS) {
 
                 } else {
 
+                    /*** FILE "LOOP" ***/
+
                     obj_opts = _.extend({}, helper.filterOptions(options)); // always make sure clean hash
 
                     obj_opts.Bucket     = the_bucket;
@@ -252,6 +254,8 @@ gulpPrefixer = function (AWS) {
 
                             callback(null);
                         });
+
+                        /*** END FILE LOOP ***/
                     }
                 }
             });
