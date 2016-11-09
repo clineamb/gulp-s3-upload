@@ -1,10 +1,20 @@
 # Changelog
 
+## Version 1.6.4
+
+*  Add a fix for [Issue #42](https://github.com/clineamb/gulp-s3-upload/issues/42).
+  *  `maps.ContentEncoding` / `manualContentEncoding` were not getting properly called in the loop and thus not setting per file uploaded.
+  *   Additional code refactoring for `maps.Metadata` / `metadataMap`.  Looked as if it could have the same (unreported) issue.
+  *   Updated some stylistic code nit-picks.
+*  Actually upgrade `package.json` from last time.
+
 ## Version 1.6.3
 
 *  Merge in spelling fix. [PR #41](https://github.com/clineamb/gulp-s3-upload/pull/41).
 *  Upgrade npm packages:
   *  `event-stream` - `3.3.2  →  ^3.3.4`
+
+_1.6.2 got mixed up in `npm publish` errors._
 
 ## Version 1.6.1
 
