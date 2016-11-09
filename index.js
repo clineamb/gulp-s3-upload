@@ -63,7 +63,6 @@ gulpPrefixer = function (AWS) {
                 keyname = keyTransform(file.relative);
 
             } else {
-
                 // ...Otherwise keep it exactly parallel.
 
                 keyparts = helper.parsePath(file.relative);
@@ -98,7 +97,7 @@ gulpPrefixer = function (AWS) {
             //  ** WILL DEPRICATE IN 2.0.0 **
 
             if (_.isFunction(options.metadataMap)) {
-                metadata = options.metadataMap(keyname);
+                metadata = options.metadataMap;
             } else if(_.isObject(options.metadataMap)) {
                 options.Metadata = options.metadataMap;
             }
@@ -124,10 +123,10 @@ gulpPrefixer = function (AWS) {
                 'Key': keyname
             }, function (head_err, head_data) {
 
-                var objOpts;
+                var obj_opts;
 
-                // If object doesn't exist then S3 returns 404 or 403 depending on whether you have s3:ListBucket permission.
-                // See http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html#rest-object-head-permissions
+                //  If object doesn't exist then S3 returns 404 or 403 depending on whether you have s3:ListBucket permission.
+                //  See http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html#rest-object-head-permissions
                 if(head_err && !(head_err.statusCode === 404 || head_err.statusCode === 403)) {
                     return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
                 }
@@ -135,13 +134,13 @@ gulpPrefixer = function (AWS) {
                 //  === ETag Hash Comparison =============================
                 //  Do a local hash comparison to reduce
                 //  the overhead from calling upload anyway.
-                //  Add the option for a different algorithm, JIC for
-                //  some reason the algorithm is not MD5.
+                //  Add the option for a different algorithm
+                //  JIC for some reason the algorithm is not MD5.
                 //  Available algorithms are those available w/ default
                 //  node `crypto` plugin. (run `crypto.getCiphers()`)
 
                 if(!options.etag_hash) {
-                    //  If not defined, default to md5
+                    //  If not defined, default to md5. 
                     options.etag_hash = 'md5';
                 }
 
@@ -157,32 +156,32 @@ gulpPrefixer = function (AWS) {
                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
 
                     if (options.onNoChange && typeof options.onNoChange === 'function') {
-                      options.onNoChange.call(this, keyname);
+                        options.onNoChange.call(this, keyname);
                     }
 
                     callback(null);
 
                 } else {
 
-                    objOpts = _.extend({}, helper.filterOptions(options));
+                    obj_opts = _.extend({}, helper.filterOptions(options)); // always make sure clean hash
 
-                    objOpts.Bucket          = the_bucket;
-                    objOpts.Key             = keyname;
-                    objOpts.Body            = file.contents;
+                    obj_opts.Bucket     = the_bucket;
+                    obj_opts.Key        = keyname;
+                    obj_opts.Body       = file.contents;
 
                     if(mimetype.length) {
                         //  A check in case of map ContentType
-                        objOpts.ContentType     = mimetype;
+                        obj_opts.ContentType = mimetype;
                     }
 
-                    if(!_.isNull(metadata)) {
-                        // existing objOpts.Metadata gets overwrriten
-                        objOpts.Metadata = metadata;
+                    if(_.isFunction(metadata)) {
+                        // existing obj_opts.Metadata gets overwrriten
+                        obj_opts.Metadata = metadata(keyname);
                     }
 
-                    if(!_.isNull(content_encoding)) {
-                        // existing objOpts.ContentEncoding gets overwrriten
-                        objOpts.ContentEncoding = content_encoding(keyname);
+                    if(_.isFunction(content_encoding)) {
+                        // existing obj_opts.ContentEncoding gets overwrriten
+                        obj_opts.ContentEncoding = content_encoding(keyname);
                     }
 
                     //  === maps.ParamNames =================================
@@ -199,21 +198,20 @@ gulpPrefixer = function (AWS) {
                     if(!_.isUndefined(options.maps)) {
                         _.each(options.maps, function(mapRoutine, param_name) {
                             if(_.isFunction(mapRoutine)) {
-                                objOpts[param_name] = mapRoutine(keyname);
+                                obj_opts[param_name] = mapRoutine(keyname);
                             }
                         });
                     }
-
-                    gutil.log("ContentEncoding?", keyname,  _.keys(objOpts));
 
                     if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
                         //  When using streams, the ContentLength must be
                         //  known to S3. This is only possible if the incoming
                         //  vinyl file somehow carries the byte length.
+
                         if (file.isStream()) {
                             if (file.stat) {
-                                objOpts.ContentLength = file.stat.size;
+                                obj_opts.ContentLength = file.stat.size;
                             } else {
                                 return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Upload of streamObject must have a ContentLength"));
                             }
@@ -221,7 +219,7 @@ gulpPrefixer = function (AWS) {
 
                         gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
 
-                        _s3.putObject(objOpts, function (err, data) {
+                        _s3.putObject(obj_opts, function (err, data) {
 
                             if (err) {
                                 return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
@@ -232,14 +230,14 @@ gulpPrefixer = function (AWS) {
                                     gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
 
                                     if (options.onChange && typeof options.onChange === 'function') {
-                                      options.onChange.call(this, keyname);
+                                        options.onChange.call(this, keyname);
                                     }
 
                                 } else {
                                     gutil.log(gutil.colors.gray("No Change ..... "), keyname);
 
                                     if (options.onNoChange && typeof options.onNoChange === 'function') {
-                                      options.onNoChange.call(this, keyname);
+                                        options.onNoChange.call(this, keyname);
                                     }
                                     
                                 }
@@ -248,7 +246,7 @@ gulpPrefixer = function (AWS) {
                                 gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
 
                                 if (options.onNew && typeof options.onNew === 'function') {
-                                  options.onNew.call(this, keyname);
+                                    options.onNew.call(this, keyname);
                                 }
                             }
 
