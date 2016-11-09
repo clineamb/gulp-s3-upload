@@ -107,7 +107,7 @@ gulpPrefixer = function (AWS) {
             //  ** WILL DEPRICATE IN 2.0.0 **
 
             if(_.isFunction(options.manualContentEncoding)) {
-                content_encoding = options.manualContentEncoding(keyname);
+                content_encoding = options.manualContentEncoding;
             } else if(_.isString(options.manualContentEncoding)) {
                 options.ContentEncoding = options.manualContentEncoding;
             }
@@ -159,7 +159,7 @@ gulpPrefixer = function (AWS) {
 
                 } else {
 
-                    objOpts = helper.filterOptions(options);
+                    objOpts = _.extend({}, helper.filterOptions(options));
 
                     objOpts.Bucket          = the_bucket;
                     objOpts.Key             = keyname;
@@ -177,7 +177,7 @@ gulpPrefixer = function (AWS) {
 
                     if(!_.isNull(content_encoding)) {
                         // existing objOpts.ContentEncoding gets overwrriten
-                        objOpts.ContentEncoding = content_encoding;
+                        objOpts.ContentEncoding = content_encoding(keyname);
                     }
 
                     //  === maps.ParamNames =================================
@@ -192,12 +192,14 @@ gulpPrefixer = function (AWS) {
                     //  if they were included in maps hash.
 
                     if(!_.isUndefined(options.maps)) {
-                        _.each(options.maps, function(mapRoutine, ParamName) {
+                        _.each(options.maps, function(mapRoutine, param_name) {
                             if(_.isFunction(mapRoutine)) {
-                                objOpts[ParamName] = mapRoutine(keyname);
+                                objOpts[param_name] = mapRoutine(keyname);
                             }
                         });
                     }
+
+                    gutil.log("ContentEncoding?", keyname,  _.keys(objOpts));
 
                     if (options.uploadNewFilesOnly && !head_data || !options.uploadNewFilesOnly) {
 
