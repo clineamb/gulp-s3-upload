@@ -1,3 +1,8 @@
+/****
+    gulp-s3-upload
+    gulp plugin for uploading assets into AWS's S3 service.
+****/
+
 var es          = require('event-stream')
 ,   gutil       = require('gulp-util')
 ,   AWS         = require('aws-sdk')

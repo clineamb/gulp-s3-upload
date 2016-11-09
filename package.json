@@ -1,6 +1,6 @@
 {
   "name": "gulp-s3-upload",
-  "version": "1.6.1",
+  "version": "1.6.3",
   "description": "A gulp task to asynchronous upload/update assets to an AWS S3 Bucket.",
   "main": "index.js",
   "directories": {
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/clineamb/gulp-s3-upload",
   "dependencies": {
-    "aws-sdk": "2.4.6",
+    "aws-sdk": "2.6.15",
     "event-stream": "^3.3.2",
     "gulp-util": "^3.0.7",
     "hasha": "^2.2.0",

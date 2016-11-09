@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.6.1__
+__Version 1.6.3__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -84,7 +84,7 @@ gulp.task("upload", function() {
             Bucket: 'your-bucket-name', //  Required
             ACL:    'public-read'       //  Needs to be user-defined
         }, {
-            // S3 Construcor Options, ie:
+            // S3 Constructor Options, ie:
             maxRetries: 5
         }))
     ;
