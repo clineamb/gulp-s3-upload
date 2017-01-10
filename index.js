@@ -24,6 +24,7 @@ gulpPrefixer = function (AWS) {
         var stream
         ,   _s3         = new AWS.S3(s3conf || {})
         ,   the_bucket  = options.Bucket || options.bucket
+        ,   file_count = {} 
         ;
 
         if(!the_bucket) {
