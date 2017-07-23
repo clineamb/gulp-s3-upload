@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.6.5
+
+* Dependency version bump
+
 ## Version 1.6.4
 
 *  Add a fix for [Issue #42](https://github.com/clineamb/gulp-s3-upload/issues/42).
