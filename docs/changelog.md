@@ -1,8 +1,9 @@
 # Changelog
 
-## Version 1.6.5
+## Version 1.6.6
 
-* Dependency version bump
+* Dependency version bump (`1.6.5`)
+* Update docs (`1.6.6`) (whoops!)
 
 ## Version 1.6.4
 
