@@ -278,7 +278,7 @@ Use this to transform what the key that is used to match the MIME type when uplo
         .pipe(s3({
             Bucket: 'example-bucket',
             ACL: 'public-read',
-            mimeTypelookup: function(original_keyname) {
+            mimeTypeLookup: function(original_keyname) {
                 return original_keyname.replace('.gz', ''); // ignore gzip extension
             },
         }));
