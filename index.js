@@ -4,14 +4,15 @@
 ****/
 
 var es          = require('event-stream')
-,   gutil       = require('gulp-util')
 ,   AWS         = require('aws-sdk')
 ,   path        = require('path')
 ,   mime        = require('mime')
 ,   hasha       = require('hasha')
 ,   _           = require('underscore')
 ,   helper      = require('./src/helper.js')
-,   PluginError = gutil.PluginError
+,   PluginError = require('plugin-error')
+,   fancyLog    = require('fancy-log')
+,   colors      = require('ansi-colors')
 ,   gulpPrefixer
 ;
 
@@ -128,7 +129,7 @@ gulpPrefixer = function (AWS) {
                 //  If object doesn't exist then S3 returns 404 or 403 depending on whether you have s3:ListBucket permission.
                 //  See http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html#rest-object-head-permissions
                 if(head_err && !(head_err.statusCode === 404 || head_err.statusCode === 403)) {
-                    return callback(new gutil.PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
+                    return callback(new PluginError(PLUGIN_NAME, "S3 headObject Error: " + head_err.stack));
                 }
 
                 //  === ETag Hash Comparison =============================
@@ -153,7 +154,7 @@ gulpPrefixer = function (AWS) {
                 if(!nohash && head_data && head_data.ETag === '"' + hash + '"') {
 
                     //  AWS ETag doesn't match local ETag
-                    gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                    fancyLog(colors.gray("No Change ..... "), keyname);
 
                     if (options.onNoChange && typeof options.onNoChange === 'function') {
                         options.onNoChange.call(this, keyname);
@@ -215,28 +216,28 @@ gulpPrefixer = function (AWS) {
                             if (file.stat) {
                                 obj_opts.ContentLength = file.stat.size;
                             } else {
-                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 Upload of streamObject must have a ContentLength"));
+                                return callback(new PluginError(PLUGIN_NAME, "S3 Upload of streamObject must have a ContentLength"));
                             }
                         }
 
-                        gutil.log(gutil.colors.cyan("Uploading ..... "), keyname);
+                        fancyLog(colors.cyan("Uploading ..... "), keyname);
 
                         _s3.putObject(obj_opts, function (err, data) {
 
                             if (err) {
-                                return callback(new gutil.PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
+                                return callback(new PluginError(PLUGIN_NAME, "S3 putObject Error: " + err.stack));
                             }
 
                             if (head_data) {
                                 if (head_data.ETag !== data.ETag) {
-                                    gutil.log(gutil.colors.yellow("Updated ....... "), keyname);
+                                    fancyLog(colors.yellow("Updated ....... "), keyname);
 
                                     if (options.onChange && typeof options.onChange === 'function') {
                                         options.onChange.call(this, keyname);
                                     }
 
                                 } else {
-                                    gutil.log(gutil.colors.gray("No Change ..... "), keyname);
+                                    fancyLog(colors.gray("No Change ..... "), keyname);
 
                                     if (options.onNoChange && typeof options.onNoChange === 'function') {
                                         options.onNoChange.call(this, keyname);
@@ -245,7 +246,7 @@ gulpPrefixer = function (AWS) {
                                 }
                             } else {
                                 // Doesn't exist in bucket; the object is new to the bucket
-                                gutil.log(gutil.colors.green("Uploaded! ..... "), keyname);
+                                fancyLog(colors.green("Uploaded! ..... "), keyname);
 
                                 if (options.onNew && typeof options.onNew === 'function') {
                                     options.onNew.call(this, keyname);
@@ -299,7 +300,7 @@ module.exports = function(config, s3_config) {
     // Configure the proxy if an environment variable is present.
 
     if(process.env.HTTPS_PROXY) {
-        gutil.log("Setting https proxy to %s", process.env.HTTPS_PROXY);
+        fancyLog("Setting https proxy to %s", process.env.HTTPS_PROXY);
 
         if(!aws_config.httpOptions) {
             aws_config.httpOptions = {};

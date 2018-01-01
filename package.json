@@ -29,12 +29,14 @@
   },
   "homepage": "https://github.com/clineamb/gulp-s3-upload",
   "dependencies": {
+    "ansi-colors": "^1.0.1",
     "aws-sdk": "^2.88.0",
     "event-stream": "^3.3.4",
-    "gulp-util": "^3.0.8",
+    "fancy-log": "^1.3.2",
     "hasha": "^3.0.0",
     "https-proxy-agent": "^2.0.0",
     "mime": "^1.3.6",
+    "plugin-error": "^0.1.2",
     "underscore": "^1.8.3"
   }
 }
