@@ -1,9 +1,15 @@
 # Changelog
 
+## Version 1.7.0
+
+* `gulp.util` dropped from dependencies [Issue #50](https://github.com/clineamb/gulp-s3-upload/issues/50), fixed in [#51](https://github.com/clineamb/gulp-s3-upload/pull/51). _Thanks [TheDancingCode](https://github.com/TheDancingCode)_
+
+
 ## Version 1.6.6
 
 * Dependency version bump (`1.6.5`)
 * Update docs (`1.6.6`) (whoops!)
+
 
 ## Version 1.6.4
 
@@ -13,6 +19,7 @@
   *   Updated some stylistic code nit-picks.
 *  Actually upgrade `package.json` from last time.
 
+
 ## Version 1.6.3
 
 *  Merge in spelling fix. [PR #41](https://github.com/clineamb/gulp-s3-upload/pull/41).
@@ -20,6 +27,7 @@
   *  `event-stream` - `3.3.2  →  ^3.3.4`
 
 _1.6.2 got mixed up in `npm publish` errors._
+
 
 ## Version 1.6.1
 
