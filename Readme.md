@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.6.6__
+__Version 1.7.0__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
@@ -329,9 +329,6 @@ Example (passing a `function`):
 ```
 
 #### Post-Upload Callbacks
-
-**New in 1.5** This feature by [benib](http://github.com/benib) was merged to the main plugin for version 1.5.0.  
-
 ##### onChange
 
 Type: `function`
@@ -374,7 +371,7 @@ Type: `boolean`
 Set `uploadNewFilesOnly: true` if you only want to upload new files and not
 overwrite existing ones.
 
-## Stream Support (**New** in 1.6.0)
+## Stream Support 
 
 When uploading large files you may want to use `gulp.src` without buffers. Normally this plugin calculates an ETag hash of the contents and compares that to the existing files in the bucket. However, when using streams, we can't do this comparison.
 
