@@ -141,7 +141,7 @@ gulpPrefixer = function (AWS) {
                 //  node `crypto` plugin. (run `crypto.getCiphers()`)
 
                 if(!options.etag_hash) {
-                    //  If not defined, default to md5. 
+                    //  If not defined, default to md5.
                     options.etag_hash = 'md5';
                 }
 
@@ -242,7 +242,7 @@ gulpPrefixer = function (AWS) {
                                     if (options.onNoChange && typeof options.onNoChange === 'function') {
                                         options.onNoChange.call(this, keyname);
                                     }
-                                    
+
                                 }
                             } else {
                                 // Doesn't exist in bucket; the object is new to the bucket
@@ -256,8 +256,13 @@ gulpPrefixer = function (AWS) {
                             callback(null);
                         });
 
-                        /*** END FILE LOOP ***/
+                    } else {
+                        fancyLog(colors.gray("Skipping Upload of Existing File ..... "), keyname);
+
+                        callback(null);
                     }
+
+                    /*** END FILE LOOP ***/
                 }
             });
         });
