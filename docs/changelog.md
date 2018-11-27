@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.7.1
+
+* Merged PR to explcitly version `event-stream` due to vulnerabilities [PR #60](https://github.com/clineamb/gulp-s3-upload/pull/60)
+
 ## Version 1.7.0
 
 * `gulp.util` dropped from dependencies [Issue #50](https://github.com/clineamb/gulp-s3-upload/issues/50), fixed in [#51](https://github.com/clineamb/gulp-s3-upload/pull/51). _Thanks [TheDancingCode](https://github.com/TheDancingCode)_
