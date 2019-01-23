@@ -1,6 +1,6 @@
 {
   "name": "gulp-s3-upload",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "A gulp task to asynchronous upload/update assets to an AWS S3 Bucket.",
   "main": "index.js",
   "directories": {

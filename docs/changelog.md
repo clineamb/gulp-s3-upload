@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.7.2
+
+* Merge https://github.com/clineamb/gulp-s3-upload/pull/53 - helps apply charset to all files, not just of a certain mimetype (by [brnwll](https://github.com/brwnll))
+* Merge https://github.com/clineamb/gulp-s3-upload/pull/55 - makes sure callback is called when uploading new files and an unchanged file is seen (by [benthemonkey](https://github.com/benthemonkey))
+
+
 ## Version 1.7.1
 
 * Merged PR to explcitly version `event-stream` due to vulnerabilities [PR #60](https://github.com/clineamb/gulp-s3-upload/pull/60)

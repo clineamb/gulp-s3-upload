@@ -1,5 +1,5 @@
 # gulp-s3-upload
-__Version 1.7.1__
+__Version 1.7.2__
 
 Use for uploading assets to Amazon S3 servers.
 This helps to make it an easy gulp task.
