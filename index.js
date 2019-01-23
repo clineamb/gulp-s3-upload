@@ -88,7 +88,7 @@ gulpPrefixer = function (AWS) {
             // JIC text files get garbled. Appends to mimetype.
             // `charset` field gets filtered out later.
 
-            if (options.charset && mimetype == 'text/html') {
+            if (options.charset) {
                 mimetype += ';charset=' + options.charset;
             }
 
