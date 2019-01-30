@@ -82,7 +82,7 @@ gulpPrefixer = function (AWS) {
                 mime_lookup_name = options.mimeTypeLookup(keyname);
             }
 
-            mimetype = mime.lookup(mime_lookup_name);
+            mimetype = mime.getType(mime_lookup_name);
 
             // === Charset ==========================================
             // JIC text files get garbled. Appends to mimetype.
