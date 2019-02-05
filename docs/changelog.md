@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 1.7.3
+* Merge https://github.com/clineamb/gulp-s3-upload/pull/62 - Fixes https://github.com/clineamb/gulp-s3-upload/issues/61
+
 ## Version 1.7.2
 
 * Merge https://github.com/clineamb/gulp-s3-upload/pull/53 - helps apply charset to all files, not just of a certain mimetype (by [brnwll](https://github.com/brwnll))
