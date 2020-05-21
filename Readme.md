@@ -390,6 +390,37 @@ Example:
 
 _Added by [@algesten](https://github.com/algesten)_
 
+## IAM Policies
+
+Here is a somewhat minimal set of IAM credentials required to use `gulp-s3-upload`:
+
+```
+{
+  "Sid": "",
+  "Effect": "Allow",
+  "Action": "s3:ListBucket",
+  "Resource": [
+    "arn:aws:s3:::bucketname",
+  ]
+},
+{
+  "Sid": "",
+  "Effect": "Allow",
+  "Action": [
+    "s3:PutObject",
+    "s3:ListObjects",
+    "s3:ListMultipartUploadParts",
+    "s3:ListBucketMultipartUploads",
+    "s3:HeadObject",
+    "s3:GetObject",
+    "s3:AbortMultipartUpload"
+  ],
+  "Resource": [
+    "arn:aws:s3:::bucketname/*"
+  ]
+}
+```
+
 ## AWS-SDK References
 
 * [AWS Config Constructor](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Config.html#constructor-property)
