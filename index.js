@@ -259,6 +259,10 @@ gulpPrefixer = function (AWS) {
                     } else {
                         fancyLog(colors.gray("Skipping Upload of Existing File ..... "), keyname);
 
+                        if (options.onSkippedExisting && typeof options.onSkippedExisting === 'function') {
+                            options.onSkippedExisting.call(this, keyname);
+                        }
+
                         callback(null);
                     }
 

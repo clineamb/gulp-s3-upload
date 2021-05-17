@@ -364,6 +364,13 @@ Type: `function`
 This function gets called with the S3 keyname as the first parameter if the uploaded file is a new file in the bucket, much like `onChange`.
 
 
+##### onSkippedExisting
+
+Type: `function`
+
+This function gets called with the S3 keyname as the first parameter if the file was skipped because `uploadNewFilesOnly` is set to `true` and a different file with the same name exists on S3.
+
+
 #### uploadNewFilesOnly
 
 Type: `boolean`
