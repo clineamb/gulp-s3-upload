@@ -27,6 +27,7 @@ module.exports = {
             'onChange',
             'onNoChange',
             'onNew',
+            'onSkippedExisting',
             'uploadNewFilesOnly',
             'verbose'
         ];
